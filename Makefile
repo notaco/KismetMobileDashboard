@@ -2,10 +2,17 @@
 PLUGIN_NAME ?= mobiledashboard
 
 # Look for the kismet source in /usr/src/kismet by default
-KIS_SRC_DIR ?= ../
+KIS_SRC_DIR ?= /usr/src/kismet
 KIS_INC_DIR ?= $(KIS_SRC_DIR)
 
-include $(KIS_SRC_DIR)/Makefile.inc
+ifneq (,$(wildcard $(KIS_SRC_DIR)/Makefile.inc))
+	include $(KIS_SRC_DIR)/Makefile.inc
+else
+	INSTALL ?= $(shell which install)
+	INSTUSR ?= root
+	INSTGRP ?= root
+	nosourcedir := 1
+endif
 
 BLDHOME	= .
 top_builddir = $(BLDHOME)
@@ -21,6 +28,13 @@ all:	manifest.conf
 
 # We have no requirements for install or userinstall, we just copy our data
 install:
+ifeq ("$(INSTALL)", "")
+	$(error "No install found in kismet source include file or path!")
+endif
+ifeq ("$(nosourcedir)", "1")
+	@echo "No source directory found, assuming package manger install."
+	@echo "If INSTUSR or INSTGRP werent't provided they were set to root"
+endif
 ifeq ("$(plugindirgeneric)", "1")
 	@echo "No kismet install found in pkgconfig, assuming /usr/local"
 endif
