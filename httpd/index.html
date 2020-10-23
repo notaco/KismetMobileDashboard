@@ -1,400 +1,195 @@
 <!DOCTYPE html>
 <html>
+<head>
 <title>Kismet Mobile Dashboard</title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<head>
-    <script>
-        var KISMET_URI_PREFIX="../../"
-    </script>
+<script>
+    var KISMET_URI_PREFIX="../../"
+</script>
 
-    <!-- Core KISMET UI elements that get loaded first -->
-    <script src="../../js/jquery-3.1.0.min.js"></script>
-    <script src="../../js/jquery-ui.min.js"></script>
-    <script src="../../js/jquery.ui.touch-punch.min.js"></script>
-    <script src="../../js/jquery.ajax.binary.js"></script>
-    <script src="../../js/jquery.jspanel-compiled.min.js"></script>
-    <script src="../../js/simple-expand.min.js"></script>
-    <script src="../../js/jquery.sparkline.min.js"></script>
-    <script src="../../js/raphael.min.js"></script>
-    <script src="../../js/morris.min.js"></script>
-    <script src="../../js/Chart.bundle.min.js"></script>
-    <script src="../../js/js.storage.min.js"></script>
-    <script src="../../js/tooltipster.bundle.min.js"></script>
-    <script src="../../js/kismet.utils.js"></script>
+<!-- Core KISMET UI elements that get loaded first -->
+<script src="../../js/jquery-3.1.0.min.js"></script>
+<script src="../../js/jquery-ui.min.js"></script>
+<script src="../../js/jquery.ui.touch-punch.min.js"></script>
+<script src="../../js/jquery.ajax.binary.js"></script>
+<script src="../../js/jquery.jspanel-compiled.min.js"></script>
+<script src="../../js/simple-expand.min.js"></script>
+<script src="../../js/jquery.sparkline.min.js"></script>
+<script src="../../js/raphael.min.js"></script>
+<script src="../../js/morris.min.js"></script>
+<script src="../../js/Chart.bundle.min.js"></script>
+<script src="../../js/js.storage.min.js"></script>
+<script src="../../js/tooltipster.bundle.min.js"></script>
+<script src="../../js/kismet.utils.js"></script>
 
-    <!-- Core UI elements that get loaded first, we need these for some of the kismet
-    UI base code unfortunately even if we don't implement them -->
-    <script src="../../js/kismet.ui.sidebar.js"></script>
-    <script src="../../js/kismet.ui.tabpane.js"></script>
-    <script src="../../js/kismet.ui.settings.js"></script>
-    <script src="../../js/kismet.ui.js"></script>
-    <script src="../../js/kismet.ui.base.js"></script>
-    <script src="../../js/jquery.kismet.channeldisplay.js"></script>
-    <script src="../../js/kismet.ui.dot11.js"></script>
+<!-- Core UI elements that get loaded first, we need these for some of the kismet
+UI base code unfortunately even if we don't implement them -->
+<script src="../../js/kismet.ui.sidebar.js"></script>
+<script src="../../js/kismet.ui.tabpane.js"></script>
+<script src="../../js/kismet.ui.settings.js"></script>
+<script src="../../js/kismet.ui.js"></script>
+<script src="../../js/kismet.ui.base.js"></script>
+<script src="../../js/jquery.kismet.channeldisplay.js"></script>
+<script src="../../js/kismet.ui.dot11.js"></script>
 
-    <!-- Local includes from our relative js dir -->
-    <script src="js/packery.pkgd.min.js"></script>
+<!-- Local includes from our relative js dir -->
+<script src="js/packery.pkgd.min.js"></script>
 
-    <!-- Local includes from our relative css link -->
-    <link rel="stylesheet" type="text/css" href="../../css/font-awesome.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/tooltipster.bundle.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/jquery-ui.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/jquery.jspanel.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/morris.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.messagebus.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.alert.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.battery.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.channeldisplay.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/reset.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/text.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/layout.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/kismet.css" />
-    <link rel="stylesheet" href="css/onsenui.css">
-    <link rel="stylesheet" href="css/onsen-css-components.min.css">
-    <script src="js/onsenui.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/dashboard.css" />
-    <!-- onsenui menu function -->
-    <script>
+<!-- Local includes from our relative css link -->
+<link rel="stylesheet" type="text/css" href="../../css/font-awesome.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/tooltipster.bundle.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/jquery-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/jquery.jspanel.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/morris.css" />
+<link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.messagebus.css" />
+<link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.alert.css" />
+<link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.battery.css" />
+<link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.channeldisplay.css" />
+<link rel="stylesheet" type="text/css" href="../../css/reset.css" />
+<link rel="stylesheet" type="text/css" href="../../css/text.css" />
+<link rel="stylesheet" type="text/css" href="../../css/layout.css" />
+<link rel="stylesheet" type="text/css" href="../../css/kismet.css" />
+<link rel="stylesheet" href="css/onsenui.css">
+<link rel="stylesheet" href="css/onsen-css-components.min.css">
+<script src="js/onsenui.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/dashboard.css" />
+<!-- onsenui menu function -->
+<script>
 
 /***** If you want to preload the login password for easier operations: *****/
-    var mypass="";
+var mypass="";
 
-    window.fn = {};
+window.fn = {};
 
-    window.fn.open = function() {
-        var menu = document.getElementById('menu');
-        menu.open();
-    };
+window.fn.open = function() {
+    var menu = document.getElementById('menu');
+    menu.open();
+};
 
-    window.fn.load = function(page) {
-        // console.log("page is", page);
-        var menu = document.getElementById('menu');
-        var navi = document.getElementById('navi');
+window.fn.load = function(page) {
+    // console.log("page is", page);
+    var menu = document.getElementById('menu');
+    var navi = document.getElementById('navi');
 
-        menu.close();
-        navi.resetToPage(page, { animation: 'none' });
-    };
+    menu.close();
+    navi.resetToPage(page, { animation: 'none' });
+};
 
-    var bAuth = "";
+function login() {
+    const username = document.querySelector('#username').value;
+    const password = document.querySelector('#password').value;
 
-    function login() {
-        const username = document.querySelector('#username').value;
-        const password = document.querySelector('#password').value;
+    kismet_ui_base.LoginCheck( function(success) {
+        if (success) {
+            fn.load('home.html');
+        } else {
+            ons.notification.alert('login failed!');
+        } }, username, password );
+}
 
-        bAuth = btoa(username + ":" + password);
-        bAuthC = "Basic " + bAuth
-
-        jQuery.ajax({
-                url: "../../session/check_login",
-                type: "GET",
-                headers: {
-                    "Authorization": bAuthC
-                },
-            })
-            .done(function(data, textStatus, jqXHR) {
-                // console.log("HTTP Request Succeeded: " + jqXHR.status);
-                fn.load('home.html');
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-               // console.log("HTTP Request Failed");
-                ons.notification.alert('login failed!');
-            })
-            .always(function() {
-                /* ... */
-            });
-    }
-
-    function checkLogin() {
-        // console.log("checking login");
-        var content = document.querySelector('ons-splitter-content');
-
-        jQuery.ajax({
-                url: "../../session/check_session",
-                type: "GET",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
-                },
-            })
-            .done(function(data, textStatus, jqXHR) {
-                // console.log("HTTP Request Succeeded: " + jqXHR.status);
-                fn.load('home.html');
-                status();
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                // console.log("HTTP Request Failed");
-                fn.load('login.html');
-            })
-            .always(function() {
-                /* ... */
-            });
-    }
-
-    function checkSession(){
-
-
-        jQuery.ajax({
-                url: "../../session/check_session",
-                type: "GET",
-                headers: {
-                    },
-            })
-            .done(function(data, textStatus, jqXHR) {
-                console.log("HTTP Request Succeeded: " + jqXHR.status);
-                status();
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                console.log("HTTP Request Failed");
-            })
-            .always(function() {
-                /* ... */
-            });
-    }
-
-    function status() {
-        $("#packetsup").hide();
-        $("#packetsdown").hide();
-
-        var devices = "";
-        var last_packets = 0;
-        var last_devs = 0;
-
-        bAuthStr = "Basic " + bAuth;
-
-        jQuery.ajax({
-                url: "../../system/status.json",
-                type: "GET",
-                headers: {
-                },
-            })
-            .done(function(data, textStatus, jqXHR) {
-                // console.log("HTTP Request Succeeded: " + jqXHR.status);
-                devices = data['kismet.system.devices.count'];
-
-                var utime = Math.round((data['kismet.system.timestamp.sec'] - data['kismet.system.timestamp.start_sec']) / 60);
-
-                var now = (data['kismet.device.packets_rrd']['kismet.common.rrd.last_time'] - 1) % 60;
-                var packets = data['kismet.device.packets_rrd']['kismet.common.rrd.minute_vec'][now];
-
-                utime = " Uptime: " + utime + " minutes.";
-
-                $('#utime_d').html(utime);
-                $('#numdevs').html(devices);
-                $('#numpackets').html(packets);
-
-                getDatasources();
-                getDevices();
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                // console.log("HTTP Request Failed");
-            })
-            .always(function() {
-                setTimeout(status, 5000);
-            });
-    }
-
-    function getDatasources() {
-        var allSourceC = "";
-
-        $.get("../../datasource/all_sources.json")
-            .done(function(data) {
-                var SourceC = data.filter(function(data) { return data['kismet.datasource.running'] == "1" }).length;
-                var sourceCTotal=data.length;
-
-                if (allSourceC == "") {
-                    allSourceC = SourceC;
-                }
-
-                var chans = {};
-                for (var i = 0; i < data.length; i++) {
-                    var ds = data[i];
-
-                    for (var c in ds['kismet.datasource.channels']) {
-                        chans[ds['kismet.datasource.channels'][c]] = 1;
-                    }
-
-                    if (data[i]['kismet.datasource.error'] == 1){
-                        $('#numsources').addClass('error');
-
-                        $('#SourceErrors').html("Source Error Detected");
-                        $('#SourceErrors').addClass('error');
-                    }
-                }
-
-                $('#numchans').html(Object.keys(chans).length);
-                $('#numsources').html(SourceC);
-                $('#numsources_t').html(sourceCTotal);
-
-                var SourceConfigC = (data.length);
-            })
-            .always(function() {
-                setTimeout(getDatasources, 5000);
-            });
-    }
-
-    function getDevices() {
-
-        jQuery.ajax({
-                url: "../../devices/summary/devices.json",
-                type: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-                },
-                contentType: "application/x-www-form-urlencoded",
-                data: {
-                    "json": "{\"fields\":[\"kismet.device.base.type\",\"kismet.device.base.manuf\",\"kismet.device.base.phyname\"]}",
-                },
+function checkSession() {
+    jQuery.ajax({
+            url: "../../session/check_session",
+            type: "GET",
+            headers: {}
         })
         .done(function(data, textStatus, jqXHR) {
             // console.log("HTTP Request Succeeded: " + jqXHR.status);
-            var num802APs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi AP" }).length;
-            var num802Clients = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Client" }).length;
-            var num802Devices = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Device" }).length;
-            var num802Bridges = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Bridged" }).length;
-            var num802Adhocs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Ad-Hoc" }).length;
-            var num802WDSs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi WDS" }).length;
-
-            var numBTLEs = data.filter(function(data) { return data['kismet.device.base.type'] == "BTLE" }).length;
-            var numBrs = data.filter(function(data) { return data['kismet.device.base.type'] == "BR/EDR" }).length;
-
-            var numMousejack = data.filter(function(data) { return data['kismet.device.base.phyname'] == "NrfMousejack" }).length;
-
-
-            var numRTL433 = data.filter(function(data) { return data['kismet.device.base.manuf'] == "RTL433" }).length;
-            var numRTLADSB = data.filter(function(data) { return data['kismet.device.base.manuf'] == "RTLADSB" }).length;
-
-            var numZwave = data.filter(function(data) { return data['kismet.device.base.type'] == "Z-Wave" }).length;
-            var numUAVC = data.filter(function(data) { return data['kismet.device.base.type'] == "UAV" }).length;
-            var numUnknown = data.filter(function(data) { return data['kismet.device.base.type'] == "" }).length;
-
-            $('#num802Aps_d').html(num802APs);
-            $('#num802Clients_d').html(num802Clients);
-            $('#num802Devices_d').html(num802Devices);
-            $('#num802Bridges_d').html(num802Bridges);
-            $('#num802Adhoc_d').html(num802Adhocs);
-            $('#num802WDS_d').html(num802WDSs);
-            $('#numBTLE_d').html(numBTLEs);
-            $('#numBR_d').html(numBrs);
-            $('#numMousejack_d').html(numMousejack);
-            $('#numRTL433_d').html(numRTL433);
-            $('#numRTLADSB_d').html(numRTLADSB);
-            $('#numUAVC_d').html(numUAVC);
-            $('#numUnknown_d').html(numUnknown);
+            status();
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
-            //      console.log("HTTP Request Failed");
+            console.log("HTTP Request for 'check_session' Failed");
+            fn.load('login.html');
         })
         .always(function() {
             /* ... */
         });
-    }
+}
 
-    function list_datasources() {
-        jQuery.ajax({
-            url: "../../datasource/all_sources.json",
+function status() {
+    $("#packetsup").hide();
+    $("#packetsdown").hide();
+
+    var devices = "";
+    var last_packets = 0;
+    var last_devs = 0;
+
+    jQuery.ajax({
+            url: "../../system/status.json",
             type: "GET",
             headers: {
             },
         })
         .done(function(data, textStatus, jqXHR) {
             // console.log("HTTP Request Succeeded: " + jqXHR.status);
-            iq = data.length;
+            devices = data['kismet.system.devices.count'];
 
-            $('#datasourceslist').empty();
-            var datasources = [];
-            datasources = data;
+            var utime = Math.round((data['kismet.system.timestamp.sec'] - data['kismet.system.timestamp.start_sec']) / 60);
 
-            for (di = 0; di < iq; di++) {
-            var sourceState = "";
+            var now = (data['kismet.device.packets_rrd']['kismet.common.rrd.last_time'] - 1) % 60;
+            var packets = data['kismet.device.packets_rrd']['kismet.common.rrd.minute_vec'][now];
 
-            if (data[di]["kismet.datasource.paused"] == 1 && data[di]["kismet.datasource.running"] == 1 ) {
-                sourceState = "Paused";
-            } else if (data[di]["kismet.datasource.paused"] == 0 && data[di]["kismet.datasource.running"] == 1) {
-                sourceState = "Running";
-            } 
+            utime = " Uptime: " + utime + " minutes.";
 
-            if (data[di]["kismet.datasource.error"] == 1) {
-                sourceState = "Error";
-            }
+            $('#utime_d').html(utime);
+            $('#numdevs').html(devices);
+            $('#numpackets').html(packets);
 
-            $('#datasourceslist').append('<ons-card>' +
-                '<ons-row><ons-col><span class="dsheader">Datasource: </span>' + data[di]["kismet.datasource.name"] + '(' + data[di]["kismet.datasource.capture_interface"] + ')</ons-col></ons-row>' +
-                '<ons-row><ons-col><span class="dsheader">Driver Type: </span>' + data[di]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Hardware: </span>' + data[di]["kismet.datasource.hardware"] + '</ons-row>' +
-                '<ons-row><ons-col><span class="dsheader">UUID: </span><span style="font-size:13px;">' + data[di]["kismet.datasource.uuid"] + '</span></ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Packets: </span>' + data[di]['kismet.datasource.num_packets'] + '</ons-col></ons-row>' + '<span style="padding-top:10px;"><ons-row vertical-align="true"><ons-col><span class="dsheader" style="margin-top:15px;padding-right:10px;padding-top:10px;">Running: </span><ons-button id="statebut" modifier="material,light" onclick="pause_restart_datasource(\'' + data[di]["kismet.datasource.uuid"] + '\'' + ',' + '\'' + sourceState + '\'' + ')">' + sourceState + ' </ons-button></ons-col></ons-row></span>' + '</ons-card>');
-            }
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            //    console.log("HTTP Request Failed");
-        })
-        .always(function() {
-            setTimeout(list_datasources, 20000);
-        });
-    }
-
-    function list_interfaces() {
-        jQuery.ajax({
-            url: "../../datasource/list_interfaces.json",
-            type: "GET",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-
-            },
-        })
-        .done(function(data, textStatus, jqXHR) {
-            // console.log("HTTP Request Succeeded: " + jqXHR.status);
-
-            iiq = data.length;
-
-            $('#interfaceslist').empty();
-
-            for (ii = 0; ii < iiq; ii++) {
-                $('#interfaceslist').append('<ons-card>' + '<ons-row><ons-col><span class="dsheader">Interface: </span>' + data[ii]["kismet.datasource.probed.interface"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Hardware :</span>' + data[ii]["kismet.datasource.probed.hardware"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader"> Driver Type: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Description: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.description"] + '</ons-col></ons-row>' +
-                '</ons-card>');
-            }
+            getDatasources();
+            getDevices();
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
             // console.log("HTTP Request Failed");
         })
         .always(function() {
-                /* ... */
+            setTimeout(status, 5000);
         });
-    }
+}
 
-    function pause_restart_datasource(uuid, sourceState) {
-        // console.log("pause restart called");
-        var cmd = "";
+function getDatasources() {
+    var allSourceC = "";
 
-        if (sourceState == "Running") {
-            cmd = "/pause_source.cmd";
-        } else {
-            cmd = "/resume_source.cmd";
-        }
+    $.get("../../datasource/all_sources.json")
+        .done(function(data) {
+            var SourceC = data.filter(function(data) { return data['kismet.datasource.running'] == "1" }).length;
+            var sourceCTotal=data.length;
 
-        jQuery.ajax({
-            url: "../../datasource/by-uuid/" + uuid + cmd,
-            type: "GET",
-            headers: {},
-        })
-        .done(function(data, textStatus, jqXHR) {
-            // console.log("HTTP Request Succeeded: " + jqXHR.status);
-            list_datasources();
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            //    console.log("HTTP Request Failed");
-            ons.notification.alert("Pause/Restart failed");
+            if (allSourceC == "") {
+                allSourceC = SourceC;
+            }
+
+            var chans = {};
+            for (var i = 0; i < data.length; i++) {
+                var ds = data[i];
+
+                for (var c in ds['kismet.datasource.channels']) {
+                    chans[ds['kismet.datasource.channels'][c]] = 1;
+                }
+
+                if (data[i]['kismet.datasource.error'] == 1){
+                    $('#numsources').addClass('error');
+
+                    $('#SourceErrors').html("Source Error Detected");
+                    $('#SourceErrors').addClass('error');
+                }
+            }
+
+            $('#numchans').html(Object.keys(chans).length);
+            $('#numsources').html(SourceC);
+            $('#numsources_t').html(sourceCTotal);
+
+            var SourceConfigC = (data.length);
         })
         .always(function() {
-            /* ... */
+            setTimeout(getDatasources, 5000);
         });
-    }
+}
 
-    function getDev_byType(devType) {
-        document.querySelector('#navi').pushPage('listdevices.html', { data: { title: devType } });
+function getDevices() {
 
-        var Filtered_data = "";
-
-        jQuery.ajax({
+    jQuery.ajax({
             url: "../../devices/summary/devices.json",
             type: "POST",
             headers: {
@@ -402,110 +197,261 @@
             },
             contentType: "application/x-www-form-urlencoded",
             data: {
-                "json": "{\"fields\":[\"kismet.device.base.key\",\"kismet.device.base.macaddr\",\"kismet.device.base.type\",\"kismet.device.base.commonname\",\"kismet.device.base.manuf\",\"kismet.device.base.crypt\",\"kismet.device.base.phyname\"]}",
-                },
-        })
-        .done(function(data_r, textStatus, jqXHR) {
-            // console.log("HTTP Request Succeeded: " + jqXHR.status);
-            Filtered_data = data_r.filter(function(data_r) { return data_r['kismet.device.base.type'] == devType });
+                "json": "{\"fields\":[\"kismet.device.base.type\",\"kismet.device.base.manuf\",\"kismet.device.base.phyname\"]}",
+            },
+    })
+    .done(function(data, textStatus, jqXHR) {
+        // console.log("HTTP Request Succeeded: " + jqXHR.status);
+        var num802APs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi AP" }).length;
+        var num802Clients = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Client" }).length;
+        var num802Devices = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Device" }).length;
+        var num802Bridges = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Bridged" }).length;
+        var num802Adhocs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Ad-Hoc" }).length;
+        var num802WDSs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi WDS" }).length;
 
-            $('#listheading').html(devType);
+        var numBTLEs = data.filter(function(data) { return data['kismet.device.base.type'] == "BTLE" }).length;
+        var numBrs = data.filter(function(data) { return data['kismet.device.base.type'] == "BR/EDR" }).length;
 
-            var list = document.getElementById('devlist');
+        var numMousejack = data.filter(function(data) { return data['kismet.device.base.phyname'] == "NrfMousejack" }).length;
 
-            list.delegate = {
-                createItemContent: function(i) {
+        var numRTL433 = data.filter(function(data) { return data['kismet.device.base.manuf'] == "RTL433" }).length;
+        var numRTLADSB = data.filter(function(data) { return data['kismet.device.base.manuf'] == "RTLADSB" }).length;
+
+        var numZwave = data.filter(function(data) { return data['kismet.device.base.type'] == "Z-Wave" }).length;
+        var numUAVC = data.filter(function(data) { return data['kismet.device.base.type'] == "UAV" }).length;
+        var numUnknown = data.filter(function(data) { return data['kismet.device.base.type'] == "" }).length;
+
+        $('#num802Aps_d').html(num802APs);
+        $('#num802Clients_d').html(num802Clients);
+        $('#num802Devices_d').html(num802Devices);
+        $('#num802Bridges_d').html(num802Bridges);
+        $('#num802Adhoc_d').html(num802Adhocs);
+        $('#num802WDS_d').html(num802WDSs);
+        $('#numBTLE_d').html(numBTLEs);
+        $('#numBR_d').html(numBrs);
+        $('#numMousejack_d').html(numMousejack);
+        $('#numRTL433_d').html(numRTL433);
+        $('#numRTLADSB_d').html(numRTLADSB);
+        $('#numUAVC_d').html(numUAVC);
+        $('#numUnknown_d').html(numUnknown);
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        //      console.log("HTTP Request Failed");
+    })
+    .always(function() {
+        /* ... */
+    });
+}
+
+function list_datasources() {
+    jQuery.ajax({
+        url: "../../datasource/all_sources.json",
+        type: "GET",
+        headers: {
+        },
+    })
+    .done(function(data, textStatus, jqXHR) {
+        // console.log("HTTP Request Succeeded: " + jqXHR.status);
+        iq = data.length;
+
+        $('#datasourceslist').empty();
+        var datasources = [];
+        datasources = data;
+
+        for (di = 0; di < iq; di++) {
+        var sourceState = "";
+
+        if (data[di]["kismet.datasource.paused"] == 1 && data[di]["kismet.datasource.running"] == 1 ) {
+            sourceState = "Paused";
+        } else if (data[di]["kismet.datasource.paused"] == 0 && data[di]["kismet.datasource.running"] == 1) {
+            sourceState = "Running";
+        } 
+
+        if (data[di]["kismet.datasource.error"] == 1) {
+            sourceState = "Error";
+        }
+
+        $('#datasourceslist').append('<ons-card>' +
+            '<ons-row><ons-col><span class="dsheader">Datasource: </span>' + data[di]["kismet.datasource.name"] + '(' + data[di]["kismet.datasource.capture_interface"] + ')</ons-col></ons-row>' +
+            '<ons-row><ons-col><span class="dsheader">Driver Type: </span>' + data[di]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Hardware: </span>' + data[di]["kismet.datasource.hardware"] + '</ons-row>' +
+            '<ons-row><ons-col><span class="dsheader">UUID: </span><span style="font-size:13px;">' + data[di]["kismet.datasource.uuid"] + '</span></ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Packets: </span>' + data[di]['kismet.datasource.num_packets'] + '</ons-col></ons-row>' + '<span style="padding-top:10px;"><ons-row vertical-align="true"><ons-col><span class="dsheader" style="margin-top:15px;padding-right:10px;padding-top:10px;">Running: </span><ons-button id="statebut" modifier="material,light" onclick="pause_restart_datasource(\'' + data[di]["kismet.datasource.uuid"] + '\'' + ',' + '\'' + sourceState + '\'' + ')">' + sourceState + ' </ons-button></ons-col></ons-row></span>' + '</ons-card>');
+        }
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        //    console.log("HTTP Request Failed");
+    })
+    .always(function() {
+        setTimeout(list_datasources, 20000);
+    });
+}
+
+function list_interfaces() {
+    jQuery.ajax({
+        url: "../../datasource/list_interfaces.json",
+        type: "GET",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+
+        },
+    })
+    .done(function(data, textStatus, jqXHR) {
+        // console.log("HTTP Request Succeeded: " + jqXHR.status);
+
+        iiq = data.length;
+
+        $('#interfaceslist').empty();
+
+        for (ii = 0; ii < iiq; ii++) {
+            $('#interfaceslist').append('<ons-card>' + '<ons-row><ons-col><span class="dsheader">Interface: </span>' + data[ii]["kismet.datasource.probed.interface"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Hardware :</span>' + data[ii]["kismet.datasource.probed.hardware"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader"> Driver Type: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Description: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.description"] + '</ons-col></ons-row>' +
+            '</ons-card>');
+        }
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        // console.log("HTTP Request Failed");
+    })
+    .always(function() {
+            /* ... */
+    });
+}
+
+function pause_restart_datasource(uuid, sourceState) {
+    // console.log("pause restart called");
+    var cmd = "";
+
+    if (sourceState == "Running") {
+        cmd = "/pause_source.cmd";
+    } else {
+        cmd = "/resume_source.cmd";
+    }
+
+    jQuery.ajax({
+        url: "../../datasource/by-uuid/" + uuid + cmd,
+        type: "GET",
+        headers: {},
+    })
+    .done(function(data, textStatus, jqXHR) {
+        // console.log("HTTP Request Succeeded: " + jqXHR.status);
+        list_datasources();
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        //    console.log("HTTP Request Failed");
+        ons.notification.alert("Pause/Restart failed");
+    })
+    .always(function() {
+        /* ... */
+    });
+}
+
+function getDev_byType(devType) {
+    document.querySelector('#navi').pushPage('listdevices.html', { data: { title: devType } });
+
+    var Filtered_data = "";
+
+    jQuery.ajax({
+        url: "../../devices/summary/devices.json",
+        type: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        },
+        contentType: "application/x-www-form-urlencoded",
+        data: {
+            "json": "{\"fields\":[\"kismet.device.base.key\",\"kismet.device.base.macaddr\",\"kismet.device.base.type\",\"kismet.device.base.commonname\",\"kismet.device.base.manuf\",\"kismet.device.base.crypt\",\"kismet.device.base.phyname\"]}",
+            },
+    })
+    .done(function(data_r, textStatus, jqXHR) {
+        // console.log("HTTP Request Succeeded: " + jqXHR.status);
+        Filtered_data = data_r.filter(function(data_r) { return data_r['kismet.device.base.type'] == devType });
+
+        $('#listheading').html(devType);
+
+        var list = document.getElementById('devlist');
+
+        list.delegate = {
+            createItemContent: function(i) {
                 var iq = i + 1;
                 return ons.createElement('<ons-list-item><span style="font-weight:bold;color:blue;padding-right:10px;">' + iq + ':</span> ' + '<span onclick="dev_details(\'' + Filtered_data[i]["kismet.device.base.key"] + '\')" style="cursor:pointer;">' + Filtered_data[i]['kismet.device.base.commonname'] + ' / '+Filtered_data[i]['kismet.device.base.manuf']+'</ons-list-item>');
-
-
-
-                },
-                countItems: function() {
-                    return Filtered_data.length;
-                }
-            };
-
-            list.refresh();
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            //    console.log("HTTP Request Failed");
-        })
-        .always(function() {
-            /* ... */
-        });
-    }
-
-    function dev_details(basekey) {
-        //   console.log("device key is", basekey);
-        // console.log("so far so good",basekey);
-
-        document.getElementById('navi').pushPage('views/device_detail.html', { data: { basedkey: basekey } });
-    }
-
-    function check_db(){
-        jQuery.ajax({
-            url: "../../logging/active.json",
-            type: "GET",
-            headers: {},
-        })
-        .done(function(data, textStatus, jqXHR) {
-            console.log("HTTP Request Succeeded: " + jqXHR.status);
-            console.log(data);
-
-            if (data[0]["kismet.log.type_driver"]["kismet.logfile.type.class"]=="kismet"){
-                console.log("ready to write poi");
-                addPOI();
+            },
+            countItems: function() {
+                return Filtered_data.length;
             }
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            console.log("HTTP Request Failed");
-        })
-        .always(function() {
-            /* ... */
-        });
-    }
-
-    function addPOI() {
-        var dialog = document.getElementById('poidialog');
-
-        if (dialog) {
-            dialog.show();
-        } else {
-            ons.createElement('dialog.html', { append: true })
-            .then(function(dialog) {
-                dialog.show();
-            });
-        }
-    };
-
-    function hideDialog(id) {
-        document.getElementById(id).hide();
-    };
-
-    function writePOI() {
-        // console.log("write poi");
-        hideDialog('poidialog');
-
-        var json = {
-            "note":"this is poi test"
         };
 
-        var postdata = "json=" + JSON.stringify(json);
-
-        $.post("/poi/create_poi.cmd", data = postdata, dataType = "json");
-    }
-
-    $(function() {
-        $.ajaxSetup({
-            xhrFields: {
-                withCredentials: false
-            }
-        });
-
-        checkLogin();
+        list.refresh();
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        //    console.log("HTTP Request Failed");
+    })
+    .always(function() {
+        /* ... */
     });
-    </script>
+}
+
+function dev_details(basekey) {
+    //   console.log("device key is", basekey);
+    // console.log("so far so good",basekey);
+
+    document.getElementById('navi').pushPage('views/device_detail.html', { data: { basedkey: basekey } });
+}
+
+function check_db(){
+    jQuery.ajax({
+        url: "../../logging/active.json",
+        type: "GET",
+        headers: {},
+    })
+    .done(function(data, textStatus, jqXHR) {
+        console.log("HTTP Request Succeeded: " + jqXHR.status);
+        console.log(data);
+
+        if (data[0]["kismet.log.type_driver"]["kismet.logfile.type.class"]=="kismet"){
+            console.log("ready to write poi");
+            addPOI();
+        }
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        console.log("HTTP Request Failed");
+    })
+    .always(function() {
+        /* ... */
+    });
+}
+
+function addPOI() {
+    var dialog = document.getElementById('poidialog');
+
+    if (dialog) {
+        dialog.show();
+    } else {
+        ons.createElement('dialog.html', { append: true })
+        .then(function(dialog) {
+            dialog.show();
+        });
+    }
+};
+
+function hideDialog(id) {
+    document.getElementById(id).hide();
+};
+
+function writePOI() {
+    // console.log("write poi");
+    hideDialog('poidialog');
+
+    var json = {
+        "note":"this is poi test"
+    };
+
+    var postdata = "json=" + JSON.stringify(json);
+
+    $.post("/poi/create_poi.cmd", data = postdata, dataType = "json");
+}
+
+// jQuery onLoad function
+$(function() {
+    checkSession()
+});
+
+</script>
 </head>
 
 <body>
