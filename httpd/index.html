@@ -58,7 +58,9 @@ UI base code unfortunately even if we don't implement them -->
 <!-- onsenui menu function -->
 <script>
 
-/***** If you want to preload the login password for easier operations: *****/
+/***** If you want to preload the login and password for easier operations 
+        um this is an obvious security hole but mobile keyboards suck (i guess) *****/
+var myuser="";
 var mypass="";
 
 window.fn = {};
@@ -578,7 +580,13 @@ $(function() {
     <template id="login.html">
         <ons-page>
             <script>
-                document.querySelector('#password').value=mypass;
+                if ((myuser !== "")||(mypass !== "")) {
+                    setTimeout(function() {
+                        console.log("populating login form.");
+                        document.querySelector('#username').value=myuser;
+                        document.querySelector('#password').value=mypass;
+                    }, 100);
+                }
             </script>
             <ons-toolbar>
                 <div class="left">
@@ -593,7 +601,7 @@ $(function() {
             <div class="center">
                 <div style="text-align: center; margin-top: 200px" class="card" onclick="void(0);">
                     <p>
-                        <ons-input id="username" placeholder="Username" modifier="underbar" value="kismet"></ons-input>
+                        <ons-input id="username" placeholder="Username" modifier="underbar"></ons-input>
                     </p>
                     <p>
                         <ons-input id="password" placeholder="Password" type="password" modifier="underbar" ></ons-input>
