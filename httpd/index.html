@@ -140,27 +140,22 @@ function startUpdates() {
 }
 
 function statusAjax() {
-    var devices = "";
-    var last_packets = 0;
-    var last_devs = 0;
-
     $.ajax({
             url: "../../system/status.json",
             type: "GET"
         })
         .done(function(data, textStatus, jqXHR) {
-            devices = data['kismet.system.devices.count'];
-
             var utime = Math.round((data['kismet.system.timestamp.sec'] - data['kismet.system.timestamp.start_sec']) / 60);
+            utime = " Uptime: " + utime + " minutes.";
+
+            var devices = data['kismet.system.devices.count'];
 
             var now = (data['kismet.device.packets_rrd']['kismet.common.rrd.last_time'] - 1) % 60;
             var packets = data['kismet.device.packets_rrd']['kismet.common.rrd.minute_vec'][now];
 
-            utime = " Uptime: " + utime + " minutes.";
-
-            $('#utime_d').html(utime);
-            $('#numdevs').html(devices);
-            $('#numpackets').html(packets);
+            $('#utime_d').text(utime);
+            $('#numdevs').text(devices);
+            $('#numpackets').text(packets);
         })
         .always(function() {
             setTimeout(statusAjax, 5000);
@@ -168,97 +163,85 @@ function statusAjax() {
 }
 
 function sourcesAjax() {
-    var allSourceC = "";
+    $.ajax({
+            url: "../../datasource/all_sources.json",
+            type: "GET"
+        })
+        .done(function(data) {
+            var SourceC = data.filter(function(data) { return data['kismet.datasource.running'] == "1" }).length;
+            var sourceCTotal = data.length;
 
-    $.get("../../datasource/all_sources.json")
-    .done(function(data) {
-        var SourceC = data.filter(function(data) { return data['kismet.datasource.running'] == "1" }).length;
-        var sourceCTotal=data.length;
+            var chans = {};
+            for (var i = 0; i < data.length; i++) {
+                var datum = data[i];
 
-        if (allSourceC == "") {
-            allSourceC = SourceC;
-        }
+                for (var c in data[i]['kismet.datasource.channels']) {
+                    chans[data[i]['kismet.datasource.channels'][c]] = 1;
+                }
 
-        var chans = {};
-        for (var i = 0; i < data.length; i++) {
-            var ds = data[i];
-
-            for (var c in ds['kismet.datasource.channels']) {
-                chans[ds['kismet.datasource.channels'][c]] = 1;
+                if (data[i]['kismet.datasource.error'] == 1) {
+                    $('#numsources').addClass('error');
+                    $('#SourceErrors').text("Source Error Detected");
+                    $('#SourceErrors').addClass('error');
+                }
             }
 
-            if (data[i]['kismet.datasource.error'] == 1){
-                $('#numsources').addClass('error');
-
-                $('#SourceErrors').html("Source Error Detected");
-                $('#SourceErrors').addClass('error');
-            }
-        }
-
-        $('#numchans').html(Object.keys(chans).length);
-        $('#numsources').html(SourceC);
-        $('#numsources_t').html(sourceCTotal);
-
-        var SourceConfigC = (data.length);
-    })
-    .always(function() {
-        setTimeout(sourcesAjax, 5000);
-    });
+            $('#numchans').text(Object.keys(chans).length);
+            $('#numsources').text(SourceC);
+            $('#numsources_t').text(sourceCTotal);
+        })
+        .always(function() {
+            setTimeout(sourcesAjax, 5000);
+        });
 }
 
 function devicesAjax() {
     $.ajax({
             url: "../../devices/summary/devices.json",
             type: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-            },
-            contentType: "application/x-www-form-urlencoded",
-            data: {
-                "json": "{\"fields\":[\"kismet.device.base.type\",\"kismet.device.base.manuf\",\"kismet.device.base.phyname\"]}",
-            },
-    })
-    .done(function(data, textStatus, jqXHR) {
-        // console.log("HTTP Request Succeeded: " + jqXHR.status);
-        var num802APs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi AP" }).length;
-        var num802Clients = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Client" }).length;
-        var num802Devices = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Device" }).length;
-        var num802Bridges = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Bridged" }).length;
-        var num802Adhocs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Ad-Hoc" }).length;
-        var num802WDSs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi WDS" }).length;
+            headers: { "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" },
+            contentType: "application/x-www-form-urlencoded", // redundant ??
+            data: { "json": '{"fields":["kismet.device.base.type","kismet.device.base.manuf","kismet.device.base.phyname"]}' }
+        })
+        .done(function(data, textStatus, jqXHR) {
+            // console.log("HTTP Request Succeeded: " + jqXHR.status);
+            var num802APs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi AP" }).length;
+            var num802Clients = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Client" }).length;
+            var num802Devices = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Device" }).length;
+            var num802Bridges = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Bridged" }).length;
+            var num802Adhocs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Ad-Hoc" }).length;
+            var num802WDSs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi WDS" }).length;
 
-        var numBTLEs = data.filter(function(data) { return data['kismet.device.base.type'] == "BTLE" }).length;
-        var numBrs = data.filter(function(data) { return data['kismet.device.base.type'] == "BR/EDR" }).length;
+            var numBTLEs = data.filter(function(data) { return data['kismet.device.base.type'] == "BTLE" }).length;
+            var numBrs = data.filter(function(data) { return data['kismet.device.base.type'] == "BR/EDR" }).length;
 
-        var numMousejack = data.filter(function(data) { return data['kismet.device.base.phyname'] == "NrfMousejack" }).length;
+            var numRTL433 = data.filter(function(data) { return data['kismet.device.base.manuf'] == "RTL433" }).length;
+            var numRTLADSB = data.filter(function(data) { return data['kismet.device.base.manuf'] == "RTLADSB" }).length;
+            var numZwave = data.filter(function(data) { return data['kismet.device.base.type'] == "Z-Wave" }).length;
+            var numMousejack = data.filter(function(data) { return data['kismet.device.base.phyname'] == "NrfMousejack" }).length;
+            var numUAV = data.filter(function(data) { return data['kismet.device.base.type'] == "UAV" }).length;
+            var numUnknown = data.filter(function(data) { return data['kismet.device.base.type'] == "" }).length;
 
-        var numRTL433 = data.filter(function(data) { return data['kismet.device.base.manuf'] == "RTL433" }).length;
-        var numRTLADSB = data.filter(function(data) { return data['kismet.device.base.manuf'] == "RTLADSB" }).length;
+            $('#num802Aps_d').text(num802APs);
+            $('#num802Clients_d').text(num802Clients);
+            $('#num802Devices_d').text(num802Devices);
+            $('#num802Bridges_d').text(num802Bridges);
+            $('#num802Adhoc_d').text(num802Adhocs);
+            $('#num802WDS_d').text(num802WDSs);
 
-        var numZwave = data.filter(function(data) { return data['kismet.device.base.type'] == "Z-Wave" }).length;
-        var numUAVC = data.filter(function(data) { return data['kismet.device.base.type'] == "UAV" }).length;
-        var numUnknown = data.filter(function(data) { return data['kismet.device.base.type'] == "" }).length;
+            $('#numBTLE_d').text(numBTLEs);
+            $('#numBR_d').text(numBrs);
 
-        $('#num802Aps_d').html(num802APs);
-        $('#num802Clients_d').html(num802Clients);
-        $('#num802Devices_d').html(num802Devices);
-        $('#num802Bridges_d').html(num802Bridges);
-        $('#num802Adhoc_d').html(num802Adhocs);
-        $('#num802WDS_d').html(num802WDSs);
-        $('#numBTLE_d').html(numBTLEs);
-        $('#numBR_d').html(numBrs);
-        $('#numMousejack_d').html(numMousejack);
-        $('#numRTL433_d').html(numRTL433);
-        $('#numRTLADSB_d').html(numRTLADSB);
-        $('#numUAVC_d').html(numUAVC);
-        $('#numUnknown_d').html(numUnknown);
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-        //      console.log("HTTP Request Failed");
-    })
-    .always(function() {
-        setTimeout(devicesAjax, 5000);
-    });
+            $('#numRTL433_d').text(numRTL433);
+            $('#numRTLADSB_d').text(numRTLADSB);
+            $('#numZWave_d').text(numZwave);
+            $('#numMousejack_d').text(numMousejack);
+            $('#numUAV_d').text(numUAV);
+            $('#numUnknown_d').text(numUnknown);
+        })
+        .always(function() {
+            setTimeout(devicesAjax, 5000);
+        });
 }
 
 function list_datasources() {
@@ -636,7 +619,7 @@ $(function() {
                         <ons-col class="bignum"><span id="numZWave_d">-</span><br><span class="subtitle" onclick="getDev_byType('ZWave')" style="cursor: pointer;">Z-Wave</span></ons-col>
                         <ons-col class="bignum"><span id="numMousejack_d">-</span><br><span class="subtitle" onclick="getDev_byType('KB/Mouse')" style="cursor: pointer;">Mousejack</span></ons-col>
                         <ons-col class="bignum"><span id="numUAV_d">-</span><br><span class="subtitle" onclick="getDev_byType('UAV')" style="cursor: pointer;">UAV</span></ons-col>
-                        <ons-col class="bignum"><span id="numUnkown_d">-</span><br><span class="subtitle">Unknown*</span></ons-col>
+                        <ons-col class="bignum"><span id="numUnknown_d">-</span><br><span class="subtitle">Unknown*</span></ons-col>
                     </ons-row>
                     <ons-row>
                         <ons-col align="right"><span class="subtitle">(*unkown=Emplyt kismet.device.basetype)</span></ons-col>
