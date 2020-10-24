@@ -85,6 +85,7 @@ function login() {
 
     kismet_ui_base.LoginCheck( function(success) {
         if (success) {
+            status();
             fn.load('home.html');
         } else {
             ons.notification.alert('login failed!');
@@ -111,6 +112,7 @@ function loginCreate() {
             alert("Could not set login, check your kismet server logs.")
         },
     }).done(function() {
+        status();
         fn.load('home.html');
     });
 }
