@@ -85,8 +85,7 @@ function login() {
 
     kismet_ui_base.LoginCheck( function(success) {
         if (success) {
-            status();
-            fn.load('home.html');
+            startUpdates();
         } else {
             ons.notification.alert('login failed!');
         } }, username, password );
@@ -112,46 +111,44 @@ function loginCreate() {
             alert("Could not set login, check your kismet server logs.")
         },
     }).done(function() {
-        status();
-        fn.load('home.html');
+        startUpdates();
     });
 }
 
 function checkSession() {
-    jQuery.ajax({
+    $.ajax({
             url: "../../session/check_session",
             type: "GET",
             headers: {}
         })
         .done(function(data, textStatus, jqXHR) {
             // console.log("HTTP Request Succeeded: " + jqXHR.status);
-            status();
+            startUpdates();
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
-            console.log("HTTP Request for 'check_session' Failed");
+            console.log("HTTP Request for '/session/check_session' Failed");
             fn.load('login.html');
-        })
-        .always(function() {
-            /* ... */
         });
 }
 
-function status() {
-    $("#packetsup").hide();
-    $("#packetsdown").hide();
+function startUpdates() {
+    statusAjax();
+    devicesAjax();
+    sourcesAjax();
 
+    fn.load('home.html');
+}
+
+function statusAjax() {
     var devices = "";
     var last_packets = 0;
     var last_devs = 0;
 
-    jQuery.ajax({
+    $.ajax({
             url: "../../system/status.json",
-            type: "GET",
-            headers: {
-            },
+            type: "GET"
         })
         .done(function(data, textStatus, jqXHR) {
-            // console.log("HTTP Request Succeeded: " + jqXHR.status);
             devices = data['kismet.system.devices.count'];
 
             var utime = Math.round((data['kismet.system.timestamp.sec'] - data['kismet.system.timestamp.start_sec']) / 60);
@@ -164,60 +161,53 @@ function status() {
             $('#utime_d').html(utime);
             $('#numdevs').html(devices);
             $('#numpackets').html(packets);
-
-            getDatasources();
-            getDevices();
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            // console.log("HTTP Request Failed");
         })
         .always(function() {
-            setTimeout(status, 5000);
+            setTimeout(statusAjax, 5000);
         });
 }
 
-function getDatasources() {
+function sourcesAjax() {
     var allSourceC = "";
 
     $.get("../../datasource/all_sources.json")
-        .done(function(data) {
-            var SourceC = data.filter(function(data) { return data['kismet.datasource.running'] == "1" }).length;
-            var sourceCTotal=data.length;
+    .done(function(data) {
+        var SourceC = data.filter(function(data) { return data['kismet.datasource.running'] == "1" }).length;
+        var sourceCTotal=data.length;
 
-            if (allSourceC == "") {
-                allSourceC = SourceC;
+        if (allSourceC == "") {
+            allSourceC = SourceC;
+        }
+
+        var chans = {};
+        for (var i = 0; i < data.length; i++) {
+            var ds = data[i];
+
+            for (var c in ds['kismet.datasource.channels']) {
+                chans[ds['kismet.datasource.channels'][c]] = 1;
             }
 
-            var chans = {};
-            for (var i = 0; i < data.length; i++) {
-                var ds = data[i];
+            if (data[i]['kismet.datasource.error'] == 1){
+                $('#numsources').addClass('error');
 
-                for (var c in ds['kismet.datasource.channels']) {
-                    chans[ds['kismet.datasource.channels'][c]] = 1;
-                }
-
-                if (data[i]['kismet.datasource.error'] == 1){
-                    $('#numsources').addClass('error');
-
-                    $('#SourceErrors').html("Source Error Detected");
-                    $('#SourceErrors').addClass('error');
-                }
+                $('#SourceErrors').html("Source Error Detected");
+                $('#SourceErrors').addClass('error');
             }
+        }
 
-            $('#numchans').html(Object.keys(chans).length);
-            $('#numsources').html(SourceC);
-            $('#numsources_t').html(sourceCTotal);
+        $('#numchans').html(Object.keys(chans).length);
+        $('#numsources').html(SourceC);
+        $('#numsources_t').html(sourceCTotal);
 
-            var SourceConfigC = (data.length);
-        })
-        .always(function() {
-            setTimeout(getDatasources, 5000);
-        });
+        var SourceConfigC = (data.length);
+    })
+    .always(function() {
+        setTimeout(sourcesAjax, 5000);
+    });
 }
 
-function getDevices() {
-
-    jQuery.ajax({
+function devicesAjax() {
+    $.ajax({
             url: "../../devices/summary/devices.json",
             type: "POST",
             headers: {
@@ -267,7 +257,7 @@ function getDevices() {
         //      console.log("HTTP Request Failed");
     })
     .always(function() {
-        /* ... */
+        setTimeout(devicesAjax, 5000);
     });
 }
 
