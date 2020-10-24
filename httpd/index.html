@@ -474,28 +474,39 @@ function writePOI() {
 
 // jQuery onLoad function
 $(function() {
+    document.addEventListener('init', function(event) {
+        if (event.target.matches('#page-login')) {
+            if ((myuser !== "")||(mypass !== "")) {
+                console.log("populating login form.");
+                document.querySelector('#username').value=myuser;
+                document.querySelector('#password').value=mypass;
+            }
+        }
+    }, false);
     kismet_ui_base.ProvisionedPasswordCheck( function(code) {
-        console.log("return code:"+code);
+        //console.log("return code:"+code);
         if (code == 200 || code == 406) {
             $.get("/system/user_status.json")
                 .done(function(data) {
                     system_user = data['kismet.system.user'];
                     document.addEventListener('init', function(event) {
-                        $("#LoginPrompt").html(
-                            $('<p>')
-                            .html('Kismet requires a login to access data.')
-                        )
-                        .append(
-                            $('<p>')
-                            .html('Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.')
-                        );
+                        if (event.target.matches('#page-login')) {
+                            $("#LoginPrompt").html(
+                                $('<p>')
+                                .html('Kismet requires a login to access data.')
+                            )
+                            .append(
+                                $('<p>')
+                                .html('Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.')
+                            );
+                        }
                     }, {once: true});
                 })
                 .fail(function() {
                     console.log("HTTP Request for 'user_status.json' Failed");
                 })
                 .always(function() {
-                    checkSession();                    
+                    checkSession();
                 });
         } else {
             $.get("/system/user_status.json")
@@ -649,15 +660,6 @@ $(function() {
 
     <template id="login.html">
         <ons-page id="page-login">
-            <script>
-                if ((myuser !== "")||(mypass !== "")) {
-                    setTimeout(function() {
-                        console.log("populating login form.");
-                        document.querySelector('#username').value=myuser;
-                        document.querySelector('#password').value=mypass;
-                    }, 100);
-                }
-            </script>
             <ons-toolbar>
                 <div class="left">
                     <ons-toolbar-button onclick="fn.open()">
