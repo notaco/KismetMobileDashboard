@@ -80,8 +80,8 @@ window.fn.load = function(page) {
 };
 
 function login() {
-    const username = document.querySelector('#username').value;
-    const password = document.querySelector('#password').value;
+    username = document.querySelector('#username').value;
+    password = document.querySelector('#password').value;
 
     kismet_ui_base.LoginCheck( function(success) {
         if (success) {
@@ -89,6 +89,30 @@ function login() {
         } else {
             ons.notification.alert('login failed!');
         } }, username, password );
+}
+
+function loginCreate() {
+    username = document.querySelector('#username').value;
+    password = document.querySelector('#password').value;
+
+    kismet.putStorage('kismet.base.login.username', username);
+    kismet.putStorage('kismet.base.login.password', password);
+
+    var postdata = {
+        "username": username,
+        "password": password
+    };
+
+    $.ajax({
+        type: "POST",
+        url: "/session/set_password",
+        data: postdata,
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert("Could not set login, check your kismet server logs.")
+        },
+    }).done(function() {
+        fn.load('home.html');
+    });
 }
 
 function checkSession() {
@@ -450,7 +474,56 @@ function writePOI() {
 
 // jQuery onLoad function
 $(function() {
-    checkSession()
+    kismet_ui_base.ProvisionedPasswordCheck( function(code) {
+        console.log("return code:"+code);
+        if (code == 200 || code == 406) {
+            $.get("/system/user_status.json")
+                .done(function(data) {
+                    system_user = data['kismet.system.user'];
+                    document.addEventListener('init', function(event) {
+                        $("#LoginPrompt").html(
+                            $('<p>')
+                            .html('Kismet requires a login to access data.')
+                        )
+                        .append(
+                            $('<p>')
+                            .html('Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.')
+                        );
+                    }, {once: true});
+                })
+                .fail(function() {
+                    console.log("HTTP Request for 'user_status.json' Failed");
+                })
+                .always(function() {
+                    checkSession();                    
+                });
+        } else {
+            $.get("/system/user_status.json")
+                .done(function(data) {
+                    system_user = data['kismet.system.user'];
+                    document.addEventListener('init', function(event) {
+                        if (event.target.matches('#page-login')) {
+                            $("#LoginPrompt").html(
+                                $('<p>')
+                                .html('To finish setting up Kismet, you need to configure a login.')
+                            )
+                            .append(
+                                $('<p>')
+                                .html('This login will be stored in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.')
+                            );
+                            $("#LoginTitle").text("Create Login");
+                            $("#LoginButton").attr('onclick', '').click(loginCreate);
+                        };
+                    }, {once: true});
+                })
+                .fail(function() {
+                    console.log("HTTP Request for 'user_status.json' Failed");
+                })
+                .always(function() {
+                    fn.load('login.html');
+                });
+        }
+    });
 });
 
 </script>
@@ -485,9 +558,6 @@ $(function() {
 
     <template id="home.html">
         <ons-page id="home">
-            <script type="text/javascript">
-               checkSession();
-            </script>
             <ons-toolbar>
                 <div class="left">
                     <ons-toolbar-button onclick="fn.open()">
@@ -578,7 +648,7 @@ $(function() {
     </template>
 
     <template id="login.html">
-        <ons-page>
+        <ons-page id="page-login">
             <script>
                 if ((myuser !== "")||(mypass !== "")) {
                     setTimeout(function() {
@@ -594,7 +664,7 @@ $(function() {
                         <ons-icon icon="md-menu"></ons-icon>
                     </ons-toolbar-button>
                 </div>
-                <div class="center">
+                <div id="LoginTitle" class="center">
                     <ons-icon icon="fa-key" style="padding-right:10px"></ons-icon> Login
                 </div>
             </ons-toolbar>
@@ -607,10 +677,11 @@ $(function() {
                         <ons-input id="password" placeholder="Password" type="password" modifier="underbar" ></ons-input>
                     </p>
                     <p style="cursor:pointer;">
-                        <ons-button onClick="login();" style="cursor: pointer;">Log in</ons-button>
+                        <ons-button id="LoginButton" onClick="login();" style="cursor: pointer;">Log in</ons-button>
                     </p>
-                    <div class="card" style="font-size: 10px;">
-                        Kismet requires a username and password for functionality which changes the server, such as adding interfaces or changing configuration, or accessing some types of data.The Kismet password is stored in ~/.kismet/kismet_httpd.conf in the home directory of the user running Kismet. You will need this password to configure data sources, download pcap and other logs, or change server-side settings. If this server is running as root, so the password can be found in ~root/.kismet/kismet_httpd.conf
+                    <div id="LoginPrompt" class="card" style="font-size: 10px;">
+                        <p>Kismet requires a login to access data.</p>
+                        <p>Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as root, and the login will be saved in <code>~root/.kismet/kismet_httpd.conf</code>.</p>
                     </div>
                     <ons-bottom-toolbar>
                         <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
