@@ -204,7 +204,6 @@ function devicesAjax() {
             data: { "json": '{"fields":["kismet.device.base.type","kismet.device.base.manuf","kismet.device.base.phyname"]}' }
         })
         .done(function(data, textStatus, jqXHR) {
-            // console.log("HTTP Request Succeeded: " + jqXHR.status);
             var num802APs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi AP" }).length;
             var num802Clients = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Client" }).length;
             var num802Devices = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Device" }).length;
@@ -245,45 +244,80 @@ function devicesAjax() {
 }
 
 function list_datasources() {
-    jQuery.ajax({
+    $.ajax({
         url: "../../datasource/all_sources.json",
         type: "GET",
-        headers: {
-        },
-    })
-    .done(function(data, textStatus, jqXHR) {
-        // console.log("HTTP Request Succeeded: " + jqXHR.status);
-        iq = data.length;
+        })
+        .done(function(data, textStatus, jqXHR) {
+            $('#datasourceslist').empty();
 
-        $('#datasourceslist').empty();
-        var datasources = [];
-        datasources = data;
+            for (i = 0; i < data.length; i++) {
+                var uuid = data[i]["kismet.datasource.uuid"];
 
-        for (di = 0; di < iq; di++) {
-        var sourceState = "";
-
-        if (data[di]["kismet.datasource.paused"] == 1 && data[di]["kismet.datasource.running"] == 1 ) {
-            sourceState = "Paused";
-        } else if (data[di]["kismet.datasource.paused"] == 0 && data[di]["kismet.datasource.running"] == 1) {
-            sourceState = "Running";
-        } 
-
-        if (data[di]["kismet.datasource.error"] == 1) {
-            sourceState = "Error";
-        }
-
-        $('#datasourceslist').append('<ons-card>' +
-            '<ons-row><ons-col><span class="dsheader">Datasource: </span>' + data[di]["kismet.datasource.name"] + '(' + data[di]["kismet.datasource.capture_interface"] + ')</ons-col></ons-row>' +
-            '<ons-row><ons-col><span class="dsheader">Driver Type: </span>' + data[di]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Hardware: </span>' + data[di]["kismet.datasource.hardware"] + '</ons-row>' +
-            '<ons-row><ons-col><span class="dsheader">UUID: </span><span style="font-size:13px;">' + data[di]["kismet.datasource.uuid"] + '</span></ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Packets: </span>' + data[di]['kismet.datasource.num_packets'] + '</ons-col></ons-row>' + '<span style="padding-top:10px;"><ons-row vertical-align="true"><ons-col><span class="dsheader" style="margin-top:15px;padding-right:10px;padding-top:10px;">Running: </span><ons-button id="statebut" modifier="material,light" onclick="pause_restart_datasource(\'' + data[di]["kismet.datasource.uuid"] + '\'' + ',' + '\'' + sourceState + '\'' + ')">' + sourceState + ' </ons-button></ons-col></ons-row></span>' + '</ons-card>');
-        }
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-        //    console.log("HTTP Request Failed");
-    })
-    .always(function() {
-        setTimeout(list_datasources, 20000);
-    });
+                var sourceState = "";
+                if (data[i]["kismet.datasource.paused"] == 1 && data[i]["kismet.datasource.running"] == 1 ) {
+                    sourceState = "Paused";
+                } else if (data[i]["kismet.datasource.paused"] == 0 && data[i]["kismet.datasource.running"] == 1) {
+                    sourceState = "Running";
+                } 
+                if (data[i]["kismet.datasource.error"] == 1) {
+                    sourceState = "Error";
+                }
+                
+                $('#datasourceslist').append(
+                    $('<ons-card>', { id: uuid })
+                        .append($('<ons-row>')
+                            .append($('<ons-col>')
+                                .append($('<span>', { class: 'dsheader' }).text('Datasource: '))
+                                .append(
+                                    data[i]["kismet.datasource.name"] +
+                                    '(' + data[i]["kismet.datasource.capture_interface"] + ')'
+                                )
+                            )
+                        )
+                        .append($('<ons-row>')
+                            .append($('<ons-col>')
+                                .append($('<span>', { class: 'dsheader' }).text('Driver Type: '))
+                                .append(data[i]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"])
+                            )
+                        )
+                        .append($('<ons-row>')
+                            .append($('<ons-col>')
+                                .append($('<span>', { class: 'dsheader' }).text('Hardware: '))
+                                .append(data[i]["kismet.datasource.hardware"])
+                            )
+                        )
+                        .append($('<ons-row>')
+                            .append($('<ons-col>')
+                                .append($('<span>', { class: 'dsheader' }).text('UUID: '))
+                                .append(uuid)
+                            )
+                        )
+                        .append($('<ons-row>')
+                            .append($('<ons-col>')
+                                .append($('<span>', { class: 'dsheader' }).text('Packets: '))
+                                .append(data[i]['kismet.datasource.num_packets'])
+                            )
+                        )
+                        .append($('<ons-row>')
+                            .append($('<ons-col>')
+                                .append($('<span>', { class: 'dsheader' }).text('Running: '))
+                                .append(
+                                    $('<ons-button>', {
+                                        id: "statebut",
+                                        modifier: "material,light",
+                                        onclick: "pause_restart_datasource('" + uuid + "','" + sourceState + "')"
+                                        }
+                                    ).text(sourceState)
+                                )
+                            )
+                        )
+                );
+            }
+        })
+        .always(function() {
+            datasource_timer = setTimeout(list_datasources, 10000);
+        });
 }
 
 function list_interfaces() {
@@ -447,69 +481,83 @@ function writePOI() {
     $.post("/poi/create_poi.cmd", data = postdata, dataType = "json");
 }
 
+// timer variables
+var datasource_timer;
+
 // jQuery onLoad function
 $(function() {
+    ///// event listeners
+    // init event
     document.addEventListener('init', function(event) {
+        // login page init
         if (event.target.matches('#page-login')) {
+            // prepopulate login
             if ((myuser !== "")||(mypass !== "")) {
                 console.log("populating login form.");
                 document.querySelector('#username').value=myuser;
                 document.querySelector('#password').value=mypass;
             }
+
+            // set up prompt message
+            kismet_ui_base.ProvisionedPasswordCheck( function(code) {
+                //console.log("return code:"+code);
+                if (code == 200 || code == 406) {
+                    $.get("/system/user_status.json")
+                        .done(function(data) {
+                            system_user = data['kismet.system.user'];
+                            if (event.target.matches('#page-login')) {
+                                $("#LoginPrompt").html(
+                                    $('<p>')
+                                    .html('Kismet requires a login to access data.')
+                                )
+                                .append(
+                                    $('<p>')
+                                    .html('Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.')
+                                );
+                            }
+                        })
+                        .fail(function() {
+                            console.log("HTTP Request for 'user_status.json' Failed");
+                        })
+                } else {
+                    $.get("/system/user_status.json")
+                        .done(function(data) {
+                            system_user = data['kismet.system.user'];
+                            if (event.target.matches('#page-login')) {
+                                $("#LoginPrompt").html(
+                                    $('<p>')
+                                    .html('To finish setting up Kismet, you need to configure a login.')
+                                )
+                                .append(
+                                    $('<p>')
+                                    .html('This login will be stored in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.')
+                                );
+                                $("#LoginTitle").text("Create Login");
+                                $("#LoginButton").attr('onclick', '').click(loginCreate);
+                            };
+                        })
+                        .fail(function() {
+                            console.log("HTTP Request for 'user_status.json' Failed");
+                        })
+                }
+            });
         }
     }, false);
-    kismet_ui_base.ProvisionedPasswordCheck( function(code) {
-        //console.log("return code:"+code);
-        if (code == 200 || code == 406) {
-            $.get("/system/user_status.json")
-                .done(function(data) {
-                    system_user = data['kismet.system.user'];
-                    document.addEventListener('init', function(event) {
-                        if (event.target.matches('#page-login')) {
-                            $("#LoginPrompt").html(
-                                $('<p>')
-                                .html('Kismet requires a login to access data.')
-                            )
-                            .append(
-                                $('<p>')
-                                .html('Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.')
-                            );
-                        }
-                    }, {once: true});
-                })
-                .fail(function() {
-                    console.log("HTTP Request for 'user_status.json' Failed");
-                })
-                .always(function() {
-                    checkSession();
-                });
-        } else {
-            $.get("/system/user_status.json")
-                .done(function(data) {
-                    system_user = data['kismet.system.user'];
-                    document.addEventListener('init', function(event) {
-                        if (event.target.matches('#page-login')) {
-                            $("#LoginPrompt").html(
-                                $('<p>')
-                                .html('To finish setting up Kismet, you need to configure a login.')
-                            )
-                            .append(
-                                $('<p>')
-                                .html('This login will be stored in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.')
-                            );
-                            $("#LoginTitle").text("Create Login");
-                            $("#LoginButton").attr('onclick', '').click(loginCreate);
-                        };
-                    }, {once: true});
-                })
-                .fail(function() {
-                    console.log("HTTP Request for 'user_status.json' Failed");
-                })
-                .always(function() {
-                    fn.load('login.html');
-                });
+    // show event
+    document.addEventListener('show', function(event) {
+        if (event.target.matches('#datasources-page')) {
+            list_datasources();
         }
-    });
+    }, false);
+    // hide event
+    document.addEventListener('hide', function(event) {
+        if (event.target.matches('#datasources-page')) {
+            clearTimeout(datasource_timer);
+        }
+    }, false);
+
+    // check if we need to login
+    checkSession();
 });
 
 </script>
@@ -669,10 +717,7 @@ $(function() {
     </template>
 
     <template id="datasources.html">
-        <ons-page>
-            <script type="text/javascript">
-            list_datasources();
-            </script>
+        <ons-page id="datasources-page">
             <ons-toolbar>
                 <div class="left">
                     <ons-toolbar-button onclick="fn.open()">
@@ -685,7 +730,7 @@ $(function() {
             </ons-toolbar>
             <div class="center">
                 <div id="datasourceslist"></div>
-                <h5 style="text-align:center;font-size:14px;"> *Datasources listings are refreshed every 20 seconds</h5>
+                <h5 style="text-align:center;font-size:14px;"> *Datasources listings are refreshed every 10 seconds</h5>
             </div>
             <ons-bottom-toolbar>
                 <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
