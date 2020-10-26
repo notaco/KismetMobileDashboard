@@ -35,7 +35,7 @@ UI base code unfortunately even if we don't implement them -->
 <script src="../../js/kismet.ui.dot11.js"></script>
 
 <!-- Local includes from our relative js dir -->
-<script src="js/packery.pkgd.min.js"></script>
+<!--<script src="js/packery.pkgd.min.js"></script>-->
 
 <!-- Local includes from our relative css link -->
 <link rel="stylesheet" type="text/css" href="../../css/font-awesome.min.css" />
@@ -51,7 +51,7 @@ UI base code unfortunately even if we don't implement them -->
 <link rel="stylesheet" type="text/css" href="../../css/text.css" />
 <link rel="stylesheet" type="text/css" href="../../css/layout.css" />
 <link rel="stylesheet" type="text/css" href="../../css/kismet.css" />
-<link rel="stylesheet" href="css/onsenui.css">
+<link rel="stylesheet" href="css/onsenui.min.css">
 <link rel="stylesheet" href="css/onsen-css-components.min.css">
 <script src="js/onsenui.min.js"></script>
 <link rel="stylesheet" type="text/css" href="css/dashboard.css" />
@@ -268,7 +268,7 @@ function list_datasources() {
                     $('<ons-card>', { id: uuid })
                         .append($('<ons-row>')
                             .append($('<ons-col>')
-                                .append($('<span>', { class: 'dsheader' }).text('Datasource: '))
+                                .append($('<span>', { class: 'field-label' }).text('Datasource: '))
                                 .append(
                                     data[i]["kismet.datasource.name"] +
                                     '(' + data[i]["kismet.datasource.capture_interface"] + ')'
@@ -277,31 +277,31 @@ function list_datasources() {
                         )
                         .append($('<ons-row>')
                             .append($('<ons-col>')
-                                .append($('<span>', { class: 'dsheader' }).text('Driver Type: '))
+                                .append($('<span>', { class: 'field-label' }).text('Driver Type: '))
                                 .append(data[i]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"])
                             )
                         )
                         .append($('<ons-row>')
                             .append($('<ons-col>')
-                                .append($('<span>', { class: 'dsheader' }).text('Hardware: '))
+                                .append($('<span>', { class: 'field-label' }).text('Hardware: '))
                                 .append(data[i]["kismet.datasource.hardware"])
                             )
                         )
                         .append($('<ons-row>')
                             .append($('<ons-col>')
-                                .append($('<span>', { class: 'dsheader' }).text('UUID: '))
+                                .append($('<span>', { class: 'field-label' }).text('UUID: '))
                                 .append(uuid)
                             )
                         )
                         .append($('<ons-row>')
                             .append($('<ons-col>')
-                                .append($('<span>', { class: 'dsheader' }).text('Packets: '))
+                                .append($('<span>', { class: 'field-label' }).text('Packets: '))
                                 .append(data[i]['kismet.datasource.num_packets'])
                             )
                         )
                         .append($('<ons-row>')
                             .append($('<ons-col>')
-                                .append($('<span>', { class: 'dsheader' }).text('Running: '))
+                                .append($('<span>', { class: 'field-label' }).text('Running: '))
                                 .append(
                                     $('<ons-button>', {
                                         id: "statebut",
@@ -337,7 +337,7 @@ function list_interfaces() {
         $('#interfaceslist').empty();
 
         for (ii = 0; ii < iiq; ii++) {
-            $('#interfaceslist').append('<ons-card>' + '<ons-row><ons-col><span class="dsheader">Interface: </span>' + data[ii]["kismet.datasource.probed.interface"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Hardware :</span>' + data[ii]["kismet.datasource.probed.hardware"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader"> Driver Type: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="dsheader">Description: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.description"] + '</ons-col></ons-row>' +
+            $('#interfaceslist').append('<ons-card>' + '<ons-row><ons-col><span class="field-label">Interface: </span>' + data[ii]["kismet.datasource.probed.interface"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label">Hardware :</span>' + data[ii]["kismet.datasource.probed.hardware"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label"> Driver Type: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label">Description: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.description"] + '</ons-col></ons-row>' +
             '</ons-card>');
         }
     })
@@ -568,248 +568,248 @@ $(function() {
 </head>
 
 <body>
-   
-    <ons-splitter>
-        <ons-splitter-side id="menu" side="left" width="220px" collapse swipeable>
-            <ons-page>
-                <ons-list>
-                    <ons-list-item onclick="fn.load('home.html')" tappable>
-                        <ons-icon icon="fa-home" style="padding: 10px"></ons-icon>
-                        Home
-                    </ons-list-item>
-                    <ons-list-item onclick="fn.load('datasources.html')" tappable>
-                        <ons-icon icon="fa-puzzle-piece" style="padding: 10px"></ons-icon>Datasources
-                    </ons-list-item>
-                    <ons-list-item onclick="fn.load('interfaces.html')" tappable>
-                        <ons-icon icon="fa-code-branch" style="padding: 10px"></ons-icon>Interfaces
-                    </ons-list-item>
-                    <ons-list-item onclick="fn.load('login.html')" tappable>
-                        <ons-icon icon="fa-key" style="padding: 10px"></ons-icon>Login
-                    </ons-list-item>
-                </ons-list>
-            </ons-page>
-        </ons-splitter-side>
-        <ons-splitter-content>
-        	 <ons-navigator id="navi" page="home.html"></ons-navigator>
-        </ons-splitter-content>
-    </ons-splitter>
 
-    <template id="home.html">
-        <ons-page id="home">
-            <ons-toolbar>
-                <div class="left">
-                    <ons-toolbar-button onclick="fn.open()">
-                        <ons-icon icon="md-menu"></ons-icon>
-                    </ons-toolbar-button>
-                </div>
-                <div class="center">
-                    <ons-icon icon="fa-home" style="padding-right:10px"></ons-icon>Home
-                </div>
-            </ons-toolbar>
-            <div class="center">
-                <div class="card">
-                    <ons-row class="cheader">
-                        <ons-col>System Details:<span style="color:black"> <span id="utime_d"></span></span></ons-col>
-                    </ons-row>
-                    <ons-row height="140px">
-                        <ons-col></ons-col>
-                    </ons-row>
-                    <ons-row>
-                        <ons-col class="bignum"><span id="numsources">-</span>/<span id="numsources_t">-</span><br><span class="subtitle" id="SourceErrors">Active/Total Sources</span><br></ons-col>
-                        <ons-col class="bignum"><span id="numchans">-</span><br><span class="subtitle">Channels</span></ons-col>
-                        <ons-col class="bignum"><span id="numpackets" style="padding-right:3px;">-</span>
-                            <br><span class="subtitle">Packets/sec</span>
-                        </ons-col>
-                        <ons-col class="bignum"><span id="numdevs">-</span><i class="dataup" id="devup"></i><i class="datadown" id="devdown"></i><br><span class="subtitle">Total # of Devices</span></ons-col>
-                    </ons-row>
-                </div>
-                <div class="card">
-                    <ons-row>
-                        <ons-col class="cheader">
-                            <ons-icon icon="fa-wifi" style="padding-right:10px;color:black" size="18px"></ons-icon> 802.11 details
-                        </ons-col>
-                    </ons-row>
-                    <ons-row>
-                        <ons-col class="bignum"><span id="num802Aps_d" onclick="getDev_byType('Wi-Fi AP')" style="cursor: pointer;">-</span><br><span class="subtitle">APs</span></ons-col>
-                        <ons-col class="bignum"><span id="num802Clients_d" onclick="getDev_byType('Wi-Fi Client')" style="cursor: pointer;">-</span><br><span class="subtitle">Clients</span></ons-col>
-                        <ons-col class="bignum"><span id="num802Devices_d" onclick="getDev_byType('Wi-Fi Device')" style="cursor: pointer;">-</span><br><span class="subtitle">Devices</span></ons-col>
-                        <ons-col class="bignum"><span id="num802Bridges_d" onclick="getDev_byType('Wi-Fi Bridged')" style="cursor: pointer;">-</span><br><span class="subtitle">Bridged</span></ons-col>
-                        <ons-col class="bignum"><span id="num802Adhoc_d" onclick="getDev_byType('Wi-Fi Ad-Hoc')" style="cursor: pointer;">-</span><br><span class="subtitle">AdHoc </span></ons-col>
-                        <ons-col class="bignum"><span id="num802WDS_d" onclick="getDev_byType('WiFi WDS')" style="cursor: pointer;">-</span><br><span class="subtitle">WDS </span></ons-col>
-                    </ons-row>
-                </div>
-                <div class="card">
-                    <ons-row>
-                        <ons-col class="cheader">
-                            <ons-icon icon="fa-wifi" style="padding-right:10px;color:black" size="18px"></ons-icon> 802.11 Channels
-                        </ons-col>
-                    </ons-row>
-                    <ons-row>
-                        <ons-col style="padding-top:10px;">
-                            <div id="channels" style="width:100%;height:150px">
-                                <!-- channels div height set based on previous use of object
-                                    with html file which seemed to default to 150px (no clear
-                                    documentation). this is arbitrary and needs a better solution -->
-                            </div>
-                        </ons-col>
-                    </ons-row>
-                </div>
-                <div class="card">
-                    <ons-row>
-                        <ons-col class="cheader">
-                            <ons-icon icon="fa-bluetooth-b" style="padding-right:10px;color:black" size="18px"></ons-icon> Bluetooth
-                        </ons-col>
-                    </ons-row>
-                    <ons-row>
-                        <ons-col class="bignum"><span id="numBTLE_d" onclick="getDev_byType('BTLE')" style="cursor: pointer;">-</span><br><span class="subtitle">BTLE Devices</span></ons-col>
-                        <ons-col class="bignum"><span id="numBR_d" onclick="getDev_byType('BREDR')" style="cursor: pointer;">-</span><br><span class="subtitle">BR/EDR Devices</span></ons-col>
-                    </ons-row>
-                </div>
-                <div class="card">
-                    <ons-row>
-                        <ons-col class="cheader">
-                            <ons-icon icon="fa-globe" style="padding-right:10px;color:black" size="18px"></ons-icon> Other
-                        </ons-col>
-                    </ons-row>
-                    <ons-row>
-                        <ons-col class="bignum"><span id="numRTL433_d">-</span><br><span class="subtitle" onclick="getDev_byType('Sensor')" style="cursor: pointer;">RTL433</span></ons-col>
-                        <ons-col class="bignum"><span id="numRTLADSB_d">-</span><br><span class="subtitle" onclick="getDev_byType('Airplane')" style="cursor: pointer;">ADSB</span></ons-col>
-                        <ons-col class="bignum"><span id="numZWave_d">-</span><br><span class="subtitle" onclick="getDev_byType('ZWave')" style="cursor: pointer;">Z-Wave</span></ons-col>
-                        <ons-col class="bignum"><span id="numMousejack_d">-</span><br><span class="subtitle" onclick="getDev_byType('KB/Mouse')" style="cursor: pointer;">Mousejack</span></ons-col>
-                        <ons-col class="bignum"><span id="numUAV_d">-</span><br><span class="subtitle" onclick="getDev_byType('UAV')" style="cursor: pointer;">UAV</span></ons-col>
-                        <ons-col class="bignum"><span id="numUnknown_d">-</span><br><span class="subtitle">Unknown*</span></ons-col>
-                    </ons-row>
-                    <ons-row>
-                        <ons-col align="right"><span class="subtitle">(*unkown=Empty kismet.device.basetype)</span></ons-col>
-                    </ons-row>
-                </div>
-            </div>
-            <ons-bottom-toolbar>
-                <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard
-                </h2>
-            </ons-bottom-toolbar>
-        </ons-page>
-    </template>
-
-    <template id="login.html">
-        <ons-page id="page-login">
-            <ons-toolbar>
-                <div class="left">
-                    <ons-toolbar-button onclick="fn.open()">
-                        <ons-icon icon="md-menu"></ons-icon>
-                    </ons-toolbar-button>
-                </div>
-                <div id="LoginTitle" class="center">
-                    <ons-icon icon="fa-key" style="padding-right:10px"></ons-icon> Login
-                </div>
-            </ons-toolbar>
-            <div class="center">
-                <div style="text-align: center; margin-top: 200px" class="card" onclick="void(0);">
-                    <p>
-                        <ons-input id="username" placeholder="Username" modifier="underbar"></ons-input>
-                    </p>
-                    <p>
-                        <ons-input id="password" placeholder="Password" type="password" modifier="underbar" ></ons-input>
-                    </p>
-                    <p style="cursor:pointer;">
-                        <ons-button id="LoginButton" onClick="login();" style="cursor: pointer;">Log in</ons-button>
-                    </p>
-                    <div id="LoginPrompt" class="card" style="font-size: 10px;">
-                        <p>Kismet requires a login to access data.</p>
-                        <p>Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as root, and the login will be saved in <code>~root/.kismet/kismet_httpd.conf</code>.</p>
-                    </div>
-                    <ons-bottom-toolbar>
-                        <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
-                    </ons-bottom-toolbar>
-                </div>
-            </div>
-        </ons-page>
-    </template>
-
-    <template id="datasources.html">
-        <ons-page id="datasources-page">
-            <ons-toolbar>
-                <div class="left">
-                    <ons-toolbar-button onclick="fn.open()">
-                        <ons-icon icon="md-menu"></ons-icon>
-                    </ons-toolbar-button>
-                </div>
-                <div class="center">
-                    <ons-icon icon="fa-cog" style="padding-right:10px"></ons-icon>Datasources
-                </div>
-            </ons-toolbar>
-            <div class="center">
-                <div id="datasourceslist"></div>
-                <h5 style="text-align:center;font-size:14px;"> *Datasources listings are refreshed every 10 seconds</h5>
-            </div>
-            <ons-bottom-toolbar>
-                <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
-            </ons-bottom-toolbar>
-            </ons-toolbar>
-        </ons-page>
-    </template>
-
-    <template id="interfaces.html">
+<ons-splitter>
+    <ons-splitter-side id="menu" side="left" width="220px" collapse swipeable>
         <ons-page>
-            <script type="text/javascript">
+            <ons-list>
+                <ons-list-item onclick="fn.load('home.html')" tappable>
+                    <ons-icon icon="fa-home" style="padding: 10px"></ons-icon>
+                    Home
+                </ons-list-item>
+                <ons-list-item onclick="fn.load('datasources.html')" tappable>
+                    <ons-icon icon="fa-puzzle-piece" style="padding: 10px"></ons-icon>Datasources
+                </ons-list-item>
+                <ons-list-item onclick="fn.load('interfaces.html')" tappable>
+                    <ons-icon icon="fa-code-branch" style="padding: 10px"></ons-icon>Interfaces
+                </ons-list-item>
+                <ons-list-item onclick="fn.load('login.html')" tappable>
+                    <ons-icon icon="fa-key" style="padding: 10px"></ons-icon>Login
+                </ons-list-item>
+            </ons-list>
+        </ons-page>
+    </ons-splitter-side>
+    <ons-splitter-content>
+            <ons-navigator id="navi" page="home.html"></ons-navigator>
+    </ons-splitter-content>
+</ons-splitter>
+
+<template id="home.html">
+    <ons-page id="home">
+        <ons-toolbar>
+            <div class="left">
+                <ons-toolbar-button onclick="fn.open()">
+                    <ons-icon icon="md-menu"></ons-icon>
+                </ons-toolbar-button>
+            </div>
+            <div class="center">
+                <ons-icon icon="fa-home" style="padding-right:10px"></ons-icon>Home
+            </div>
+        </ons-toolbar>
+        <div class="center">
+            <div class="card">
+                <ons-row class="card-header">
+                    <ons-col>System Details:<span style="color:black"> <span id="utime_d"></span></span></ons-col>
+                </ons-row>
+                <ons-row height="140px">
+                    <ons-col></ons-col>
+                </ons-row>
+                <ons-row>
+                    <ons-col class="bignum"><span id="numsources">-</span>/<span id="numsources_t">-</span><br><span class="subtitle" id="SourceErrors">Active/Total Sources</span><br></ons-col>
+                    <ons-col class="bignum"><span id="numchans">-</span><br><span class="subtitle">Channels</span></ons-col>
+                    <ons-col class="bignum"><span id="numpackets" style="padding-right:3px;">-</span>
+                        <br><span class="subtitle">Packets/sec</span>
+                    </ons-col>
+                    <ons-col class="bignum"><span id="numdevs">-</span><i class="dataup" id="devup"></i><i class="datadown" id="devdown"></i><br><span class="subtitle">Total # of Devices</span></ons-col>
+                </ons-row>
+            </div>
+            <div class="card">
+                <ons-row>
+                    <ons-col class="card-header">
+                        <ons-icon icon="fa-wifi" style="padding-right:10px;color:black" size="18px"></ons-icon> 802.11 details
+                    </ons-col>
+                </ons-row>
+                <ons-row>
+                    <ons-col class="bignum"><span id="num802Aps_d" onclick="getDev_byType('Wi-Fi AP')" style="cursor: pointer;">-</span><br><span class="subtitle">APs</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Clients_d" onclick="getDev_byType('Wi-Fi Client')" style="cursor: pointer;">-</span><br><span class="subtitle">Clients</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Devices_d" onclick="getDev_byType('Wi-Fi Device')" style="cursor: pointer;">-</span><br><span class="subtitle">Devices</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Bridges_d" onclick="getDev_byType('Wi-Fi Bridged')" style="cursor: pointer;">-</span><br><span class="subtitle">Bridged</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Adhoc_d" onclick="getDev_byType('Wi-Fi Ad-Hoc')" style="cursor: pointer;">-</span><br><span class="subtitle">AdHoc </span></ons-col>
+                    <ons-col class="bignum"><span id="num802WDS_d" onclick="getDev_byType('WiFi WDS')" style="cursor: pointer;">-</span><br><span class="subtitle">WDS </span></ons-col>
+                </ons-row>
+            </div>
+            <div class="card">
+                <ons-row>
+                    <ons-col class="card-header">
+                        <ons-icon icon="fa-wifi" style="padding-right:10px;color:black" size="18px"></ons-icon> 802.11 Channels
+                    </ons-col>
+                </ons-row>
+                <ons-row>
+                    <ons-col style="padding-top:10px;">
+                        <div id="channels" style="width:100%;height:150px">
+                            <!-- channels div height set based on previous use of object
+                                with html file which seemed to default to 150px (no clear
+                                documentation). this is arbitrary and needs a better solution -->
+                        </div>
+                    </ons-col>
+                </ons-row>
+            </div>
+            <div class="card">
+                <ons-row>
+                    <ons-col class="card-header">
+                        <ons-icon icon="fa-bluetooth-b" style="padding-right:10px;color:black" size="18px"></ons-icon> Bluetooth
+                    </ons-col>
+                </ons-row>
+                <ons-row>
+                    <ons-col class="bignum"><span id="numBTLE_d" onclick="getDev_byType('BTLE')" style="cursor: pointer;">-</span><br><span class="subtitle">BTLE Devices</span></ons-col>
+                    <ons-col class="bignum"><span id="numBR_d" onclick="getDev_byType('BREDR')" style="cursor: pointer;">-</span><br><span class="subtitle">BR/EDR Devices</span></ons-col>
+                </ons-row>
+            </div>
+            <div class="card">
+                <ons-row>
+                    <ons-col class="card-header">
+                        <ons-icon icon="fa-globe" style="padding-right:10px;color:black" size="18px"></ons-icon> Other
+                    </ons-col>
+                </ons-row>
+                <ons-row>
+                    <ons-col class="bignum"><span id="numRTL433_d">-</span><br><span class="subtitle" onclick="getDev_byType('Sensor')" style="cursor: pointer;">RTL433</span></ons-col>
+                    <ons-col class="bignum"><span id="numRTLADSB_d">-</span><br><span class="subtitle" onclick="getDev_byType('Airplane')" style="cursor: pointer;">ADSB</span></ons-col>
+                    <ons-col class="bignum"><span id="numZWave_d">-</span><br><span class="subtitle" onclick="getDev_byType('ZWave')" style="cursor: pointer;">Z-Wave</span></ons-col>
+                    <ons-col class="bignum"><span id="numMousejack_d">-</span><br><span class="subtitle" onclick="getDev_byType('KB/Mouse')" style="cursor: pointer;">Mousejack</span></ons-col>
+                    <ons-col class="bignum"><span id="numUAV_d">-</span><br><span class="subtitle" onclick="getDev_byType('UAV')" style="cursor: pointer;">UAV</span></ons-col>
+                    <ons-col class="bignum"><span id="numUnknown_d">-</span><br><span class="subtitle">Unknown*</span></ons-col>
+                </ons-row>
+                <ons-row>
+                    <ons-col align="right"><span class="subtitle">(*unkown=Empty kismet.device.basetype)</span></ons-col>
+                </ons-row>
+            </div>
+        </div>
+        <ons-bottom-toolbar>
+            <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard
+            </h2>
+        </ons-bottom-toolbar>
+    </ons-page>
+</template>
+
+<template id="login.html">
+    <ons-page id="page-login">
+        <ons-toolbar>
+            <div class="left">
+                <ons-toolbar-button onclick="fn.open()">
+                    <ons-icon icon="md-menu"></ons-icon>
+                </ons-toolbar-button>
+            </div>
+            <div id="LoginTitle" class="center">
+                <ons-icon icon="fa-key" style="padding-right:10px"></ons-icon> Login
+            </div>
+        </ons-toolbar>
+        <div class="center">
+            <div style="text-align: center; margin-top: 200px" class="card" onclick="void(0);">
+                <p>
+                    <ons-input id="username" placeholder="Username" modifier="underbar"></ons-input>
+                </p>
+                <p>
+                    <ons-input id="password" placeholder="Password" type="password" modifier="underbar" ></ons-input>
+                </p>
+                <p style="cursor:pointer;">
+                    <ons-button id="LoginButton" onClick="login();" style="cursor: pointer;">Log in</ons-button>
+                </p>
+                <div id="LoginPrompt" class="card" style="font-size: 10px;">
+                    <p>Kismet requires a login to access data.</p>
+                    <p>Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as root, and the login will be saved in <code>~root/.kismet/kismet_httpd.conf</code>.</p>
+                </div>
+                <ons-bottom-toolbar>
+                    <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
+                </ons-bottom-toolbar>
+            </div>
+        </div>
+    </ons-page>
+</template>
+
+<template id="datasources.html">
+    <ons-page id="datasources-page">
+        <ons-toolbar>
+            <div class="left">
+                <ons-toolbar-button onclick="fn.open()">
+                    <ons-icon icon="md-menu"></ons-icon>
+                </ons-toolbar-button>
+            </div>
+            <div class="center">
+                <ons-icon icon="fa-cog" style="padding-right:10px"></ons-icon>Datasources
+            </div>
+        </ons-toolbar>
+        <div class="center">
+            <div id="datasourceslist"></div>
+            <h5 style="text-align:center;font-size:14px;"> *Datasources listings are refreshed every 10 seconds</h5>
+        </div>
+        <ons-bottom-toolbar>
+            <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
+        </ons-bottom-toolbar>
+        </ons-toolbar>
+    </ons-page>
+</template>
+
+<template id="interfaces.html">
+    <ons-page>
+        <script>
             list_interfaces();
-            </script>
-            <ons-toolbar>
-                <div class="left">
-                    <ons-toolbar-button onclick="fn.open()">
-                        <ons-icon icon="md-menu"></ons-icon>
-                        <div class="left"></div>
-                    </ons-toolbar-button>
-                </div>
-                <div class="center">
-                    <ons-icon icon="fa-cog" style="padding-right:10px"></ons-icon>Interfaces
-                </div>
-            </ons-toolbar>
+        </script>
+        <ons-toolbar>
+            <div class="left">
+                <ons-toolbar-button onclick="fn.open()">
+                    <ons-icon icon="md-menu"></ons-icon>
+                    <div class="left"></div>
+                </ons-toolbar-button>
+            </div>
             <div class="center">
-                <div id="interfaceslist"></div>
-                <h5 style="text-align:center;font-size:14px;"> *Interfaces listings </h5>
+                <ons-icon icon="fa-cog" style="padding-right:10px"></ons-icon>Interfaces
             </div>
-            <ons-bottom-toolbar>
-                <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
-            </ons-bottom-toolbar>
-            </ons-toolbar>
-        </ons-page>
-    </template>
+        </ons-toolbar>
+        <div class="center">
+            <div id="interfaceslist"></div>
+            <h5 style="text-align:center;font-size:14px;"> *Interfaces listings </h5>
+        </div>
+        <ons-bottom-toolbar>
+            <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
+        </ons-bottom-toolbar>
+        </ons-toolbar>
+    </ons-page>
+</template>
 
-    <template id="listdevices.html">
-        <ons-page>
-            <ons-toolbar>
-                <div class="left">
-                    <ons-back-button>Home</ons-back-button>
-                </div>
-                <div class="center">
-                    <ons-icon icon="fa-cog" style="padding-right:10px"></ons-icon>Listing:<span id="listheading"></span>
-                </div>
-            </ons-toolbar>
+<template id="listdevices.html">
+    <ons-page>
+        <ons-toolbar>
+            <div class="left">
+                <ons-back-button>Home</ons-back-button>
+            </div>
             <div class="center">
-                <ons-list>
-                    <ons-lazy-repeat id="devlist"></ons-lazy-repeat>
-                </ons-list>
+                <ons-icon icon="fa-cog" style="padding-right:10px"></ons-icon>Listing:<span id="listheading"></span>
             </div>
-            <ons-bottom-toolbar>
-                <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
-            </ons-bottom-toolbar>
-            </ons-toolbar>
-        </ons-page>
-    </template>
+        </ons-toolbar>
+        <div class="center">
+            <ons-list>
+                <ons-lazy-repeat id="devlist"></ons-lazy-repeat>
+            </ons-list>
+        </div>
+        <ons-bottom-toolbar>
+            <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
+        </ons-bottom-toolbar>
+        </ons-toolbar>
+    </ons-page>
+</template>
 
-    <template id="dialog.html">
-        <ons-alert-dialog modifier="rowfooter" id="poidialog" cancelable>
-            <div class="alert-dialog-title">Add Point of Interest</div>
-            <div class="alert-dialog-content">
-                <ons-input modifier="underbar"></ons-input>
-            </div>
-            <div class="alert-dialog-footer">
-                <button class="alert-dialog-button" onclick="hideDialog('poidialog')">Cancel</button>
-                <button class="alert-dialog-button" onclick="writePOI()">OK</button>
-            </div>
-        </ons-alert-dialog>
-    </template>
+<template id="dialog.html">
+    <ons-alert-dialog modifier="rowfooter" id="poidialog" cancelable>
+        <div class="alert-dialog-title">Add Point of Interest</div>
+        <div class="alert-dialog-content">
+            <ons-input modifier="underbar"></ons-input>
+        </div>
+        <div class="alert-dialog-footer">
+            <button class="alert-dialog-button" onclick="hideDialog('poidialog')">Cancel</button>
+            <button class="alert-dialog-button" onclick="writePOI()">OK</button>
+        </div>
+    </ons-alert-dialog>
+</template>
 
 </body>
 </html>
