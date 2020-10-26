@@ -1,10 +1,35 @@
-.cheader{
-    font-size:18px;
+#uptime {
+    color: black;
+}
+
+#login-card {
+    text-align: center;
+    margin-top: 40px;
+}
+
+#login-header {
+    font-size: 14px;
     font-weight: bold;
-    margin-top:5px;
-    margin-bottom:5px;
+}
+
+#login-prompt {
+    background: lightgrey;
+    font-size: 10px;
+}
+
+.card-header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 5px;
     padding-left: 10px;
     color: blue;
+}
+
+.card-icon {
+     font-size: 18px;
+     padding-right: 10px;
+     color: black;
 }
 
 .bignum {
@@ -19,29 +44,42 @@
     text-align: center;
 }
 
-
-.data-up {
-    font-size: 18px;
-    color: green;
-}
-
-.data-down {
-    font-size: 18px;
-    color: red;
-}
-
-.error {
-    color: #ff0000;
-}
-
-.dsheader{
-    font-size:14px;
+.field-label {
+    font-size: 14px;
     font-weight: bold;
-    margin-top:5px;
-    margin-bottom:5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     padding-left: 10px;
     color: blue;
+}
 
+.dev-label {
+    font-weight: bold;
+    padding-right: 10px;
+    color: blue;
+}
+
+.dev-note {
+    text-align: center;
+    font-size: 14px;
+}
+
+.icon-nav-menu {
+    padding: 10px;
+}
+
+.icon-header-bar {
+    padding-right: 10px;
+}
+
+.bottom-toolbar {
+    font-weight: bold;
+    text-align: center;
+    padding-top: 5px;
+}
+
+.show-clickable {
+    cursor: pointer;
 }
 
 .error {

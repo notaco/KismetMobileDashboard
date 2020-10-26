@@ -153,7 +153,7 @@ function statusAjax() {
             var now = (data['kismet.device.packets_rrd']['kismet.common.rrd.last_time'] - 1) % 60;
             var packets = data['kismet.device.packets_rrd']['kismet.common.rrd.minute_vec'][now];
 
-            $('#utime_d').text(utime);
+            $('#uptime').text(utime);
             $('#numdevs').text(devices);
             $('#numpackets').text(packets);
         })
@@ -337,7 +337,7 @@ function list_interfaces() {
         $('#interfaceslist').empty();
 
         for (ii = 0; ii < iiq; ii++) {
-            $('#interfaceslist').append('<ons-card>' + '<ons-row><ons-col><span class="field-label">Interface: </span>' + data[ii]["kismet.datasource.probed.interface"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label">Hardware :</span>' + data[ii]["kismet.datasource.probed.hardware"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label"> Driver Type: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label">Description: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.description"] + '</ons-col></ons-row>' +
+            $('#interfaceslist').append('<ons-card>' + '<ons-row><ons-col><span class="field-label">Interface: </span>' + data[ii]["kismet.datasource.probed.interface"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label">Hardware: </span>' + data[ii]["kismet.datasource.probed.hardware"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label"> Driver Type: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label">Description: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.description"] + '</ons-col></ons-row>' +
             '</ons-card>');
         }
     })
@@ -404,7 +404,7 @@ function getDev_byType(devType) {
         list.delegate = {
             createItemContent: function(i) {
                 var iq = i + 1;
-                return ons.createElement('<ons-list-item><span style="font-weight:bold;color:blue;padding-right:10px;">' + iq + ':</span> ' + '<span onclick="dev_details(\'' + Filtered_data[i]["kismet.device.base.key"] + '\')" style="cursor:pointer;">' + Filtered_data[i]['kismet.device.base.commonname'] + ' / '+Filtered_data[i]['kismet.device.base.manuf']+'</ons-list-item>');
+                return ons.createElement('<ons-list-item><span class="dev-label">' + iq + ':</span> ' + '<span onclick="dev_details(\'' + Filtered_data[i]["kismet.device.base.key"] + '\')" class="show-clickable">' + Filtered_data[i]['kismet.device.base.commonname'] + ' / '+Filtered_data[i]['kismet.device.base.manuf']+'</ons-list-item>');
             },
             countItems: function() {
                 return Filtered_data.length;
@@ -506,14 +506,10 @@ $(function() {
                         .done(function(data) {
                             system_user = data['kismet.system.user'];
                             if (event.target.matches('#page-login')) {
-                                $("#LoginPrompt").html(
-                                    $('<p>')
-                                    .html('Kismet requires a login to access data.')
-                                )
-                                .append(
-                                    $('<p>')
-                                    .html('Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.')
-                                );
+                                $("#login-header")
+                                    .text('Kismet requires a login to access data.');
+                                $("#login-prompt")
+                                    .html('Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.');
                             }
                         })
                         .fail(function() {
@@ -524,16 +520,12 @@ $(function() {
                         .done(function(data) {
                             system_user = data['kismet.system.user'];
                             if (event.target.matches('#page-login')) {
-                                $("#LoginPrompt").html(
-                                    $('<p>')
-                                    .html('To finish setting up Kismet, you need to configure a login.')
-                                )
-                                .append(
-                                    $('<p>')
-                                    .html('This login will be stored in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.')
-                                );
-                                $("#LoginTitle").text("Create Login");
-                                $("#LoginButton").attr('onclick', '').click(loginCreate);
+                                $("#login-header")
+                                    .text('To finish setting up Kismet, you need to configure a login.');
+                                $("#login-prompt")
+                                    .html('This login will be stored in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.');
+                                $("#login-title").text("Create Login");
+                                $("#login-button").attr('onclick', '').click(loginCreate);
                             };
                         })
                         .fail(function() {
@@ -574,17 +566,17 @@ $(function() {
         <ons-page>
             <ons-list>
                 <ons-list-item onclick="fn.load('home.html')" tappable>
-                    <ons-icon icon="fa-home" style="padding: 10px"></ons-icon>
+                    <ons-icon icon="fa-home" class="icon-nav-menu"></ons-icon>
                     Home
                 </ons-list-item>
                 <ons-list-item onclick="fn.load('datasources.html')" tappable>
-                    <ons-icon icon="fa-puzzle-piece" style="padding: 10px"></ons-icon>Datasources
+                    <ons-icon icon="fa-puzzle-piece" class="icon-nav-menu"></ons-icon>Datasources
                 </ons-list-item>
                 <ons-list-item onclick="fn.load('interfaces.html')" tappable>
-                    <ons-icon icon="fa-code-branch" style="padding: 10px"></ons-icon>Interfaces
+                    <ons-icon icon="fa-code-branch" class="icon-nav-menu"></ons-icon>Interfaces
                 </ons-list-item>
                 <ons-list-item onclick="fn.load('login.html')" tappable>
-                    <ons-icon icon="fa-key" style="padding: 10px"></ons-icon>Login
+                    <ons-icon icon="fa-key" class="icon-nav-menu"></ons-icon>Login
                 </ons-list-item>
             </ons-list>
         </ons-page>
@@ -603,13 +595,13 @@ $(function() {
                 </ons-toolbar-button>
             </div>
             <div class="center">
-                <ons-icon icon="fa-home" style="padding-right:10px"></ons-icon>Home
+                <ons-icon icon="fa-home" class="icon-header-bar"></ons-icon>Home
             </div>
         </ons-toolbar>
         <div class="center">
             <div class="card">
                 <ons-row class="card-header">
-                    <ons-col>System Details:<span style="color:black"> <span id="utime_d"></span></span></ons-col>
+                    <ons-col>System Details: <span id="uptime"></span></ons-col>
                 </ons-row>
                 <ons-row height="140px">
                     <ons-col></ons-col>
@@ -617,7 +609,7 @@ $(function() {
                 <ons-row>
                     <ons-col class="bignum"><span id="numsources">-</span>/<span id="numsources_t">-</span><br><span class="subtitle" id="SourceErrors">Active/Total Sources</span><br></ons-col>
                     <ons-col class="bignum"><span id="numchans">-</span><br><span class="subtitle">Channels</span></ons-col>
-                    <ons-col class="bignum"><span id="numpackets" style="padding-right:3px;">-</span>
+                    <ons-col class="bignum"><span id="numpackets">-</span>
                         <br><span class="subtitle">Packets/sec</span>
                     </ons-col>
                     <ons-col class="bignum"><span id="numdevs">-</span><i class="dataup" id="devup"></i><i class="datadown" id="devdown"></i><br><span class="subtitle">Total # of Devices</span></ons-col>
@@ -626,27 +618,27 @@ $(function() {
             <div class="card">
                 <ons-row>
                     <ons-col class="card-header">
-                        <ons-icon icon="fa-wifi" style="padding-right:10px;color:black" size="18px"></ons-icon> 802.11 details
+                        <ons-icon icon="fa-wifi" class="card-icon"></ons-icon> 802.11 details
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col class="bignum"><span id="num802Aps_d" onclick="getDev_byType('Wi-Fi AP')" style="cursor: pointer;">-</span><br><span class="subtitle">APs</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Clients_d" onclick="getDev_byType('Wi-Fi Client')" style="cursor: pointer;">-</span><br><span class="subtitle">Clients</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Devices_d" onclick="getDev_byType('Wi-Fi Device')" style="cursor: pointer;">-</span><br><span class="subtitle">Devices</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Bridges_d" onclick="getDev_byType('Wi-Fi Bridged')" style="cursor: pointer;">-</span><br><span class="subtitle">Bridged</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Adhoc_d" onclick="getDev_byType('Wi-Fi Ad-Hoc')" style="cursor: pointer;">-</span><br><span class="subtitle">AdHoc </span></ons-col>
-                    <ons-col class="bignum"><span id="num802WDS_d" onclick="getDev_byType('WiFi WDS')" style="cursor: pointer;">-</span><br><span class="subtitle">WDS </span></ons-col>
+                    <ons-col class="bignum"><span id="num802Aps_d" onclick="getDev_byType('Wi-Fi AP')" class="show-clickable">-</span><br><span class="subtitle">APs</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Clients_d" onclick="getDev_byType('Wi-Fi Client')" class="show-clickable">-</span><br><span class="subtitle">Clients</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Devices_d" onclick="getDev_byType('Wi-Fi Device')" class="show-clickable">-</span><br><span class="subtitle">Devices</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Bridges_d" onclick="getDev_byType('Wi-Fi Bridged')" class="show-clickable">-</span><br><span class="subtitle">Bridged</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Adhoc_d" onclick="getDev_byType('Wi-Fi Ad-Hoc')" class="show-clickable">-</span><br><span class="subtitle">AdHoc </span></ons-col>
+                    <ons-col class="bignum"><span id="num802WDS_d" onclick="getDev_byType('WiFi WDS')" class="show-clickable">-</span><br><span class="subtitle">WDS </span></ons-col>
                 </ons-row>
             </div>
             <div class="card">
                 <ons-row>
                     <ons-col class="card-header">
-                        <ons-icon icon="fa-wifi" style="padding-right:10px;color:black" size="18px"></ons-icon> 802.11 Channels
+                        <ons-icon icon="fa-wifi" class="card-icon"></ons-icon> 802.11 Channels
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col style="padding-top:10px;">
-                        <div id="channels" style="width:100%;height:150px">
+                    <ons-col>
+                        <div id="channels" style="width: 100%; height: 150px;">
                             <!-- channels div height set based on previous use of object
                                 with html file which seemed to default to 150px (no clear
                                 documentation). this is arbitrary and needs a better solution -->
@@ -657,26 +649,26 @@ $(function() {
             <div class="card">
                 <ons-row>
                     <ons-col class="card-header">
-                        <ons-icon icon="fa-bluetooth-b" style="padding-right:10px;color:black" size="18px"></ons-icon> Bluetooth
+                        <ons-icon icon="fa-bluetooth-b" class="card-icon"></ons-icon> Bluetooth
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col class="bignum"><span id="numBTLE_d" onclick="getDev_byType('BTLE')" style="cursor: pointer;">-</span><br><span class="subtitle">BTLE Devices</span></ons-col>
-                    <ons-col class="bignum"><span id="numBR_d" onclick="getDev_byType('BREDR')" style="cursor: pointer;">-</span><br><span class="subtitle">BR/EDR Devices</span></ons-col>
+                    <ons-col class="bignum"><span id="numBTLE_d" onclick="getDev_byType('BTLE')" class="show-clickable">-</span><br><span class="subtitle">BTLE Devices</span></ons-col>
+                    <ons-col class="bignum"><span id="numBR_d" onclick="getDev_byType('BREDR')" class="show-clickable">-</span><br><span class="subtitle">BR/EDR Devices</span></ons-col>
                 </ons-row>
             </div>
             <div class="card">
                 <ons-row>
                     <ons-col class="card-header">
-                        <ons-icon icon="fa-globe" style="padding-right:10px;color:black" size="18px"></ons-icon> Other
+                        <ons-icon icon="fa-globe" class="card-icon"></ons-icon> Other
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col class="bignum"><span id="numRTL433_d">-</span><br><span class="subtitle" onclick="getDev_byType('Sensor')" style="cursor: pointer;">RTL433</span></ons-col>
-                    <ons-col class="bignum"><span id="numRTLADSB_d">-</span><br><span class="subtitle" onclick="getDev_byType('Airplane')" style="cursor: pointer;">ADSB</span></ons-col>
-                    <ons-col class="bignum"><span id="numZWave_d">-</span><br><span class="subtitle" onclick="getDev_byType('ZWave')" style="cursor: pointer;">Z-Wave</span></ons-col>
-                    <ons-col class="bignum"><span id="numMousejack_d">-</span><br><span class="subtitle" onclick="getDev_byType('KB/Mouse')" style="cursor: pointer;">Mousejack</span></ons-col>
-                    <ons-col class="bignum"><span id="numUAV_d">-</span><br><span class="subtitle" onclick="getDev_byType('UAV')" style="cursor: pointer;">UAV</span></ons-col>
+                    <ons-col class="bignum"><span id="numRTL433_d">-</span><br><span class="subtitle" onclick="getDev_byType('Sensor')" class="show-clickable">RTL433</span></ons-col>
+                    <ons-col class="bignum"><span id="numRTLADSB_d">-</span><br><span class="subtitle" onclick="getDev_byType('Airplane')" class="show-clickable">ADSB</span></ons-col>
+                    <ons-col class="bignum"><span id="numZWave_d">-</span><br><span class="subtitle" onclick="getDev_byType('ZWave')" class="show-clickable">Z-Wave</span></ons-col>
+                    <ons-col class="bignum"><span id="numMousejack_d">-</span><br><span class="subtitle" onclick="getDev_byType('KB/Mouse')" class="show-clickable">Mousejack</span></ons-col>
+                    <ons-col class="bignum"><span id="numUAV_d">-</span><br><span class="subtitle" onclick="getDev_byType('UAV')" class="show-clickable">UAV</span></ons-col>
                     <ons-col class="bignum"><span id="numUnknown_d">-</span><br><span class="subtitle">Unknown*</span></ons-col>
                 </ons-row>
                 <ons-row>
@@ -685,7 +677,7 @@ $(function() {
             </div>
         </div>
         <ons-bottom-toolbar>
-            <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard
+            <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard
             </h2>
         </ons-bottom-toolbar>
     </ons-page>
@@ -699,27 +691,21 @@ $(function() {
                     <ons-icon icon="md-menu"></ons-icon>
                 </ons-toolbar-button>
             </div>
-            <div id="LoginTitle" class="center">
-                <ons-icon icon="fa-key" style="padding-right:10px"></ons-icon> Login
+            <div id="login-title" class="center">
+                <ons-icon icon="fa-key" class="icon-header-bar"></ons-icon> Login
             </div>
         </ons-toolbar>
         <div class="center">
-            <div style="text-align: center; margin-top: 200px" class="card" onclick="void(0);">
-                <p>
-                    <ons-input id="username" placeholder="Username" modifier="underbar"></ons-input>
-                </p>
-                <p>
-                    <ons-input id="password" placeholder="Password" type="password" modifier="underbar" ></ons-input>
-                </p>
-                <p style="cursor:pointer;">
-                    <ons-button id="LoginButton" onClick="login();" style="cursor: pointer;">Log in</ons-button>
-                </p>
-                <div id="LoginPrompt" class="card" style="font-size: 10px;">
-                    <p>Kismet requires a login to access data.</p>
-                    <p>Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as root, and the login will be saved in <code>~root/.kismet/kismet_httpd.conf</code>.</p>
+            <div id="login-card" class="card">
+                <p id="login-header">Kismet requires a login to access data.</p>
+                <p><ons-input id="username" placeholder="Username" modifier="underbar"></ons-input></p>
+                <p><ons-input id="password" placeholder="Password" type="password" modifier="underbar" ></ons-input></p>
+                <p><ons-button id="login-button" class="show-clickable" onClick="login();">Log in</ons-button></p>
+                <div id="login-prompt" class="card">
+                    Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as root, and the login will be saved in <code>~root/.kismet/kismet_httpd.conf</code>.
                 </div>
                 <ons-bottom-toolbar>
-                    <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
+                    <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
                 </ons-bottom-toolbar>
             </div>
         </div>
@@ -735,15 +721,15 @@ $(function() {
                 </ons-toolbar-button>
             </div>
             <div class="center">
-                <ons-icon icon="fa-cog" style="padding-right:10px"></ons-icon>Datasources
+                <ons-icon icon="fa-cog" class="icon-header-bar"></ons-icon>Datasources
             </div>
         </ons-toolbar>
         <div class="center">
             <div id="datasourceslist"></div>
-            <h5 style="text-align:center;font-size:14px;"> *Datasources listings are refreshed every 10 seconds</h5>
+            <h5 class="dev-note"> *Datasources listings are refreshed every 10 seconds</h5>
         </div>
         <ons-bottom-toolbar>
-            <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
+            <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
         </ons-bottom-toolbar>
         </ons-toolbar>
     </ons-page>
@@ -762,15 +748,15 @@ $(function() {
                 </ons-toolbar-button>
             </div>
             <div class="center">
-                <ons-icon icon="fa-cog" style="padding-right:10px"></ons-icon>Interfaces
+                <ons-icon icon="fa-cog" class="icon-header-bar"></ons-icon>Interfaces
             </div>
         </ons-toolbar>
         <div class="center">
             <div id="interfaceslist"></div>
-            <h5 style="text-align:center;font-size:14px;"> *Interfaces listings </h5>
+            <h5 class="dev-note"> *Interfaces listings </h5>
         </div>
         <ons-bottom-toolbar>
-            <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
+            <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
         </ons-bottom-toolbar>
         </ons-toolbar>
     </ons-page>
@@ -783,7 +769,7 @@ $(function() {
                 <ons-back-button>Home</ons-back-button>
             </div>
             <div class="center">
-                <ons-icon icon="fa-cog" style="padding-right:10px"></ons-icon>Listing:<span id="listheading"></span>
+                <ons-icon icon="fa-cog" class="icon-header-bar"></ons-icon>Listing:<span id="listheading"></span>
             </div>
         </ons-toolbar>
         <div class="center">
@@ -792,7 +778,7 @@ $(function() {
             </ons-list>
         </div>
         <ons-bottom-toolbar>
-            <h2 class="card__title" style="text-align:center;font-weight:bold;padding-top:5px;">KISMET Mobile Dashboard</h2>
+            <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
         </ons-bottom-toolbar>
         </ons-toolbar>
     </ons-page>
