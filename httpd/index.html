@@ -541,6 +541,9 @@ $(function() {
                         })
                 }
             });
+        } // home init
+        else if (event.target.matches('#home')) {
+            $('#channels').channels();
         }
     }, false);
     // show event
@@ -549,6 +552,7 @@ $(function() {
             list_datasources();
         }
     }, false);
+
     // hide event
     document.addEventListener('hide', function(event) {
         if (event.target.matches('#datasources-page')) {
@@ -638,11 +642,17 @@ $(function() {
                     <ons-row>
                         <ons-col class="cheader">
                             <ons-icon icon="fa-wifi" style="padding-right:10px;color:black" size="18px"></ons-icon> 802.11 Channels
-                            <ons-row>
-                                <ons-col style="padding-top:10px;">
-                                    <object data="views/channelmobiledisp.html" width="100%"></object>
-                                </ons-col>
-                            </ons-row>
+                        </ons-col>
+                    </ons-row>
+                    <ons-row>
+                        <ons-col style="padding-top:10px;">
+                            <div id="channels" style="width:100%;height:150px">
+                                <!-- channels div height set based on previous use of object
+                                    with html file which seemed to default to 150px (no clear
+                                    documentation). this is arbitrary and needs a better solution -->
+                            </div>
+                        </ons-col>
+                    </ons-row>
                 </div>
                 <div class="card">
                     <ons-row>
@@ -670,7 +680,7 @@ $(function() {
                         <ons-col class="bignum"><span id="numUnknown_d">-</span><br><span class="subtitle">Unknown*</span></ons-col>
                     </ons-row>
                     <ons-row>
-                        <ons-col align="right"><span class="subtitle">(*unkown=Emplyt kismet.device.basetype)</span></ons-col>
+                        <ons-col align="right"><span class="subtitle">(*unkown=Empty kismet.device.basetype)</span></ons-col>
                     </ons-row>
                 </div>
             </div>
