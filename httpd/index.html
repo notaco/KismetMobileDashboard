@@ -255,10 +255,12 @@ function list_datasources() {
                 var uuid = data[i]["kismet.datasource.uuid"];
 
                 var sourceState = "";
+                var switchState = false;
                 if (data[i]["kismet.datasource.paused"] == 1 && data[i]["kismet.datasource.running"] == 1 ) {
                     sourceState = "Paused";
                 } else if (data[i]["kismet.datasource.paused"] == 0 && data[i]["kismet.datasource.running"] == 1) {
                     sourceState = "Running";
+                    switchState = true;
                 } 
                 if (data[i]["kismet.datasource.error"] == 1) {
                     sourceState = "Error";
@@ -269,10 +271,13 @@ function list_datasources() {
                         .append($('<ons-row>')
                             .append($('<ons-col>')
                                 .append($('<span>', { class: 'field-label' }).text('Datasource: '))
-                                .append(
-                                    data[i]["kismet.datasource.name"] +
-                                    '(' + data[i]["kismet.datasource.capture_interface"] + ')'
-                                )
+                                .append(data[i]["kismet.datasource.name"])
+                            )
+                        )
+                        .append($('<ons-row>')
+                            .append($('<ons-col>')
+                                .append($('<span>', { class: 'field-label' }).text('Interface: '))
+                                .append(data[i]["kismet.datasource.capture_interface"])
                             )
                         )
                         .append($('<ons-row>')
@@ -303,12 +308,13 @@ function list_datasources() {
                             .append($('<ons-col>')
                                 .append($('<span>', { class: 'field-label' }).text('Running: '))
                                 .append(
-                                    $('<ons-button>', {
-                                        id: "statebut",
-                                        modifier: "material,light",
-                                        onclick: "pause_restart_datasource('" + uuid + "','" + sourceState + "')"
+                                    $('<ons-switch>', {
+                                        id: "state-switch",
+                                        modifier: "material",
+                                        onChange: "pause_restart_datasource('" + uuid + "','" + sourceState + "')",
+                                        checked: switchState
                                         }
-                                    ).text(sourceState)
+                                    )
                                 )
                             )
                         )
