@@ -105,7 +105,7 @@ function loginCreate() {
 
     $.ajax({
         type: "POST",
-        url: "/session/set_password",
+        url: "../../session/set_password",
         data: postdata,
         error: function(jqXHR, textStatus, errorThrown) {
             alert("Could not set login, check your kismet server logs.")
@@ -197,7 +197,7 @@ function sourcesAjax() {
 
 function devicesAjax() {
     $.ajax({
-            url: "../../devices/summary/devices.json",
+            url: "../../devices/views/all/devices.json",
             type: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" },
             contentType: "application/x-www-form-urlencoded", // redundant ??
@@ -478,7 +478,7 @@ function writePOI() {
 
     var postdata = "json=" + JSON.stringify(json);
 
-    $.post("/poi/create_poi.cmd", data = postdata, dataType = "json");
+    $.post("../../poi/create_poi.cmd", data = postdata, dataType = "json");
 }
 
 // timer variables
@@ -502,7 +502,7 @@ $(function() {
             kismet_ui_base.ProvisionedPasswordCheck( function(code) {
                 //console.log("return code:"+code);
                 if (code == 200 || code == 406) {
-                    $.get("/system/user_status.json")
+                    $.get("../../system/user_status.json")
                         .done(function(data) {
                             system_user = data['kismet.system.user'];
                             if (event.target.matches('#page-login')) {
@@ -520,7 +520,7 @@ $(function() {
                             console.log("HTTP Request for 'user_status.json' Failed");
                         })
                 } else {
-                    $.get("/system/user_status.json")
+                    $.get("../../system/user_status.json")
                         .done(function(data) {
                             system_user = data['kismet.system.user'];
                             if (event.target.matches('#page-login')) {
