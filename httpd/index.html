@@ -5,561 +5,33 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script>
-    var KISMET_URI_PREFIX="../../"
-</script>
+<script src="js/jquery-3.5.1.min.js"></script>
+<script src="js/js.storage.min.js"></script>
+<script src="js/onsenui.min.js"></script>
+<script src="js/Chart.min.js"></script>
+<script src="js/kmd.js"></script>
+<script src="js/kmd-login.js"></script>
+<script src="js/kmd-home.js"></script>
+<script src="js/kmd-channelgraph.js"></script>
+<script src="js/kmd-datasource.js"></script>
 
-<!-- Core KISMET UI elements that get loaded first -->
-<script src="../../js/jquery-3.1.0.min.js"></script>
-<script src="../../js/jquery-ui.min.js"></script>
-<script src="../../js/jquery.ui.touch-punch.min.js"></script>
-<script src="../../js/jquery.ajax.binary.js"></script>
-<script src="../../js/jquery.jspanel-compiled.min.js"></script>
-<script src="../../js/simple-expand.min.js"></script>
-<script src="../../js/jquery.sparkline.min.js"></script>
-<script src="../../js/raphael.min.js"></script>
-<script src="../../js/morris.min.js"></script>
-<script src="../../js/Chart.bundle.min.js"></script>
-<script src="../../js/js.storage.min.js"></script>
-<script src="../../js/tooltipster.bundle.min.js"></script>
-<script src="../../js/kismet.utils.js"></script>
-
-<!-- Core UI elements that get loaded first, we need these for some of the kismet
-UI base code unfortunately even if we don't implement them -->
-<script src="../../js/kismet.ui.sidebar.js"></script>
-<script src="../../js/kismet.ui.tabpane.js"></script>
-<script src="../../js/kismet.ui.settings.js"></script>
-<script src="../../js/kismet.ui.js"></script>
-<script src="../../js/kismet.ui.base.js"></script>
-<script src="../../js/jquery.kismet.channeldisplay.js"></script>
-<script src="../../js/kismet.ui.dot11.js"></script>
-
-<!-- Local includes from our relative js dir -->
-<!--<script src="js/packery.pkgd.min.js"></script>-->
-
-<!-- Local includes from our relative css link -->
-<link rel="stylesheet" type="text/css" href="../../css/font-awesome.min.css" />
-<link rel="stylesheet" type="text/css" href="../../css/tooltipster.bundle.min.css" />
-<link rel="stylesheet" type="text/css" href="../../css/jquery-ui.min.css" />
-<link rel="stylesheet" type="text/css" href="../../css/jquery.jspanel.min.css" />
-<link rel="stylesheet" type="text/css" href="../../css/morris.css" />
-<link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.messagebus.css" />
-<link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.alert.css" />
-<link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.battery.css" />
-<link rel="stylesheet" type="text/css" href="../../css/jquery.kismet.channeldisplay.css" />
-<link rel="stylesheet" type="text/css" href="../../css/reset.css" />
-<link rel="stylesheet" type="text/css" href="../../css/text.css" />
-<link rel="stylesheet" type="text/css" href="../../css/layout.css" />
-<link rel="stylesheet" type="text/css" href="../../css/kismet.css" />
 <link rel="stylesheet" href="css/onsenui.min.css">
 <link rel="stylesheet" href="css/onsen-css-components.min.css">
-<script src="js/onsenui.min.js"></script>
-<link rel="stylesheet" type="text/css" href="css/dashboard.css" />
-<!-- onsenui menu function -->
+<link rel="stylesheet" href="css/Chart.min.css">
+<link rel="stylesheet" href="css/kmd.css" />
+
 <script>
+// relative uri of kismet
+var kmd_rest_prefix = "../../"
 
-/***** If you want to preload the login and password for easier operations 
-        um this is an obvious security hole but mobile keyboards suck (i guess) *****/
-var myuser="";
-var mypass="";
-
-window.fn = {};
-
-window.fn.open = function() {
-    var menu = document.getElementById('menu');
-    menu.open();
-};
-
-window.fn.load = function(page) {
-    // console.log("page is", page);
-    var menu = document.getElementById('menu');
-    var navi = document.getElementById('navi');
-
-    menu.close();
-    navi.resetToPage(page, { animation: 'none' });
-};
-
-function login() {
-    username = document.querySelector('#username').value;
-    password = document.querySelector('#password').value;
-
-    kismet_ui_base.LoginCheck( function(success) {
-        if (success) {
-            startUpdates();
-        } else {
-            ons.notification.alert('login failed!');
-        } }, username, password );
-}
-
-function loginCreate() {
-    username = document.querySelector('#username').value;
-    password = document.querySelector('#password').value;
-
-    kismet.putStorage('kismet.base.login.username', username);
-    kismet.putStorage('kismet.base.login.password', password);
-
-    var postdata = {
-        "username": username,
-        "password": password
-    };
-
-    $.ajax({
-        type: "POST",
-        url: "../../session/set_password",
-        data: postdata,
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert("Could not set login, check your kismet server logs.")
-        },
-    }).done(function() {
-        startUpdates();
-    });
-}
-
-function checkSession() {
-    $.ajax({
-            url: "../../session/check_session",
-            type: "GET",
-            headers: {}
-        })
-        .done(function(data, textStatus, jqXHR) {
-            // console.log("HTTP Request Succeeded: " + jqXHR.status);
-            startUpdates();
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            console.log("HTTP Request for '/session/check_session' Failed");
-            fn.load('login.html');
-        });
-}
-
-function startUpdates() {
-    statusAjax();
-    devicesAjax();
-    sourcesAjax();
-
-    fn.load('home.html');
-}
-
-function statusAjax() {
-    $.ajax({
-            url: "../../system/status.json",
-            type: "GET"
-        })
-        .done(function(data, textStatus, jqXHR) {
-            var utime = Math.round((data['kismet.system.timestamp.sec'] - data['kismet.system.timestamp.start_sec']) / 60);
-            utime = " Uptime: " + utime + " minutes.";
-
-            var devices = data['kismet.system.devices.count'];
-
-            var now = (data['kismet.device.packets_rrd']['kismet.common.rrd.last_time'] - 1) % 60;
-            var packets = data['kismet.device.packets_rrd']['kismet.common.rrd.minute_vec'][now];
-
-            $('#uptime').text(utime);
-            $('#numdevs').text(devices);
-            $('#numpackets').text(packets);
-        })
-        .always(function() {
-            setTimeout(statusAjax, 5000);
-        });
-}
-
-function sourcesAjax() {
-    $.ajax({
-            url: "../../datasource/all_sources.json",
-            type: "GET"
-        })
-        .done(function(data) {
-            var SourceC = data.filter(function(data) { return data['kismet.datasource.running'] == "1" }).length;
-            var sourceCTotal = data.length;
-
-            var chans = {};
-            for (var i = 0; i < data.length; i++) {
-                var datum = data[i];
-
-                for (var c in data[i]['kismet.datasource.channels']) {
-                    chans[data[i]['kismet.datasource.channels'][c]] = 1;
-                }
-
-                if (data[i]['kismet.datasource.error'] == 1) {
-                    $('#numsources').addClass('error');
-                    $('#SourceErrors').text("Source Error Detected");
-                    $('#SourceErrors').addClass('error');
-                }
-            }
-
-            $('#numchans').text(Object.keys(chans).length);
-            $('#numsources').text(SourceC);
-            $('#numsources_t').text(sourceCTotal);
-        })
-        .always(function() {
-            setTimeout(sourcesAjax, 5000);
-        });
-}
-
-function devicesAjax() {
-    $.ajax({
-            url: "../../devices/views/all/devices.json",
-            type: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" },
-            contentType: "application/x-www-form-urlencoded", // redundant ??
-            data: { "json": '{"fields":["kismet.device.base.type","kismet.device.base.manuf","kismet.device.base.phyname"]}' }
-        })
-        .done(function(data, textStatus, jqXHR) {
-            var num802APs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi AP" }).length;
-            var num802Clients = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Client" }).length;
-            var num802Devices = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Device" }).length;
-            var num802Bridges = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Bridged" }).length;
-            var num802Adhocs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi Ad-Hoc" }).length;
-            var num802WDSs = data.filter(function(data) { return data['kismet.device.base.type'] == "Wi-Fi WDS" }).length;
-
-            var numBTLEs = data.filter(function(data) { return data['kismet.device.base.type'] == "BTLE" }).length;
-            var numBrs = data.filter(function(data) { return data['kismet.device.base.type'] == "BR/EDR" }).length;
-
-            var numRTL433 = data.filter(function(data) { return data['kismet.device.base.manuf'] == "RTL433" }).length;
-            var numRTLADSB = data.filter(function(data) { return data['kismet.device.base.manuf'] == "RTLADSB" }).length;
-            var numZwave = data.filter(function(data) { return data['kismet.device.base.type'] == "Z-Wave" }).length;
-            var numMousejack = data.filter(function(data) { return data['kismet.device.base.phyname'] == "NrfMousejack" }).length;
-            var numUAV = data.filter(function(data) { return data['kismet.device.base.type'] == "UAV" }).length;
-            var numUnknown = data.filter(function(data) { return data['kismet.device.base.type'] == "" }).length;
-
-            $('#num802Aps_d').text(num802APs);
-            $('#num802Clients_d').text(num802Clients);
-            $('#num802Devices_d').text(num802Devices);
-            $('#num802Bridges_d').text(num802Bridges);
-            $('#num802Adhoc_d').text(num802Adhocs);
-            $('#num802WDS_d').text(num802WDSs);
-
-            $('#numBTLE_d').text(numBTLEs);
-            $('#numBR_d').text(numBrs);
-
-            $('#numRTL433_d').text(numRTL433);
-            $('#numRTLADSB_d').text(numRTLADSB);
-            $('#numZWave_d').text(numZwave);
-            $('#numMousejack_d').text(numMousejack);
-            $('#numUAV_d').text(numUAV);
-            $('#numUnknown_d').text(numUnknown);
-        })
-        .always(function() {
-            setTimeout(devicesAjax, 5000);
-        });
-}
-
-function list_datasources() {
-    $.ajax({
-        url: "../../datasource/all_sources.json",
-        type: "GET",
-        })
-        .done(function(data, textStatus, jqXHR) {
-            $('#datasourceslist').empty();
-
-            for (i = 0; i < data.length; i++) {
-                var uuid = data[i]["kismet.datasource.uuid"];
-
-                var sourceState = "";
-                var switchState = false;
-                if (data[i]["kismet.datasource.paused"] == 1 && data[i]["kismet.datasource.running"] == 1 ) {
-                    sourceState = "Paused";
-                } else if (data[i]["kismet.datasource.paused"] == 0 && data[i]["kismet.datasource.running"] == 1) {
-                    sourceState = "Running";
-                    switchState = true;
-                } 
-                if (data[i]["kismet.datasource.error"] == 1) {
-                    sourceState = "Error";
-                }
-                
-                $('#datasourceslist').append(
-                    $('<ons-card>', { id: uuid })
-                        .append($('<ons-row>')
-                            .append($('<ons-col>')
-                                .append($('<span>', { class: 'field-label' }).text('Datasource: '))
-                                .append(data[i]["kismet.datasource.name"])
-                            )
-                        )
-                        .append($('<ons-row>')
-                            .append($('<ons-col>')
-                                .append($('<span>', { class: 'field-label' }).text('Interface: '))
-                                .append(data[i]["kismet.datasource.capture_interface"])
-                            )
-                        )
-                        .append($('<ons-row>')
-                            .append($('<ons-col>')
-                                .append($('<span>', { class: 'field-label' }).text('Driver Type: '))
-                                .append(data[i]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"])
-                            )
-                        )
-                        .append($('<ons-row>')
-                            .append($('<ons-col>')
-                                .append($('<span>', { class: 'field-label' }).text('Hardware: '))
-                                .append(data[i]["kismet.datasource.hardware"])
-                            )
-                        )
-                        .append($('<ons-row>')
-                            .append($('<ons-col>')
-                                .append($('<span>', { class: 'field-label' }).text('UUID: '))
-                                .append(uuid)
-                            )
-                        )
-                        .append($('<ons-row>')
-                            .append($('<ons-col>')
-                                .append($('<span>', { class: 'field-label' }).text('Packets: '))
-                                .append(data[i]['kismet.datasource.num_packets'])
-                            )
-                        )
-                        .append($('<ons-row>')
-                            .append($('<ons-col>')
-                                .append($('<span>', { class: 'field-label' }).text('Running: '))
-                                .append(
-                                    $('<ons-switch>', {
-                                        id: "state-switch",
-                                        modifier: "material",
-                                        onChange: "pause_restart_datasource('" + uuid + "','" + sourceState + "')",
-                                        checked: switchState
-                                        }
-                                    )
-                                )
-                            )
-                        )
-                );
-            }
-        })
-        .always(function() {
-            datasource_timer = setTimeout(list_datasources, 10000);
-        });
-}
-
-function list_interfaces() {
-    jQuery.ajax({
-        url: "../../datasource/list_interfaces.json",
-        type: "GET",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-
-        },
-    })
-    .done(function(data, textStatus, jqXHR) {
-        // console.log("HTTP Request Succeeded: " + jqXHR.status);
-
-        iiq = data.length;
-
-        $('#interfaceslist').empty();
-
-        for (ii = 0; ii < iiq; ii++) {
-            $('#interfaceslist').append('<ons-card>' + '<ons-row><ons-col><span class="field-label">Interface: </span>' + data[ii]["kismet.datasource.probed.interface"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label">Hardware: </span>' + data[ii]["kismet.datasource.probed.hardware"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label"> Driver Type: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.type"] + '</ons-col></ons-row>' + '<ons-row><ons-col><span class="field-label">Description: </span>' + data[ii]["kismet.datasource.type_driver"]["kismet.datasource.driver.description"] + '</ons-col></ons-row>' +
-            '</ons-card>');
-        }
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-        // console.log("HTTP Request Failed");
-    })
-    .always(function() {
-            /* ... */
-    });
-}
-
-function pause_restart_datasource(uuid, sourceState) {
-    // console.log("pause restart called");
-    var cmd = "";
-
-    if (sourceState == "Running") {
-        cmd = "/pause_source.cmd";
-    } else {
-        cmd = "/resume_source.cmd";
-    }
-
-    jQuery.ajax({
-        url: "../../datasource/by-uuid/" + uuid + cmd,
-        type: "GET",
-        headers: {},
-    })
-    .done(function(data, textStatus, jqXHR) {
-        // console.log("HTTP Request Succeeded: " + jqXHR.status);
-        list_datasources();
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-        //    console.log("HTTP Request Failed");
-        ons.notification.alert("Pause/Restart failed");
-    })
-    .always(function() {
-        /* ... */
-    });
-}
-
-function getDev_byType(devType) {
-    document.querySelector('#navi').pushPage('listdevices.html', { data: { title: devType } });
-
-    var Filtered_data = "";
-
-    jQuery.ajax({
-        url: "../../devices/views/all/devices.json",
-        type: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        },
-        contentType: "application/x-www-form-urlencoded",
-        data: {
-            "json": "{\"fields\":[\"kismet.device.base.key\",\"kismet.device.base.macaddr\",\"kismet.device.base.type\",\"kismet.device.base.commonname\",\"kismet.device.base.manuf\",\"kismet.device.base.crypt\",\"kismet.device.base.phyname\"]}",
-            },
-    })
-    .done(function(data_r, textStatus, jqXHR) {
-        // console.log("HTTP Request Succeeded: " + jqXHR.status);
-        Filtered_data = data_r.filter(function(data_r) { return data_r['kismet.device.base.type'] == devType });
-
-        $('#listheading').html(devType);
-
-        var list = document.getElementById('devlist');
-
-        list.delegate = {
-            createItemContent: function(i) {
-                var iq = i + 1;
-                return ons.createElement('<ons-list-item><span class="dev-label">' + iq + ':</span> ' + '<span onclick="dev_details(\'' + Filtered_data[i]["kismet.device.base.key"] + '\')" class="show-clickable">' + Filtered_data[i]['kismet.device.base.commonname'] + ' / '+Filtered_data[i]['kismet.device.base.manuf']+'</ons-list-item>');
-            },
-            countItems: function() {
-                return Filtered_data.length;
-            }
-        };
-
-        list.refresh();
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-        //    console.log("HTTP Request Failed");
-    })
-    .always(function() {
-        /* ... */
-    });
-}
-
-function dev_details(basekey) {
-    //   console.log("device key is", basekey);
-    // console.log("so far so good",basekey);
-
-    document.getElementById('navi').pushPage('views/device_detail.html', { data: { basedkey: basekey } });
-}
-
-function check_db(){
-    jQuery.ajax({
-        url: "../../logging/active.json",
-        type: "GET",
-        headers: {},
-    })
-    .done(function(data, textStatus, jqXHR) {
-        console.log("HTTP Request Succeeded: " + jqXHR.status);
-        console.log(data);
-
-        if (data[0]["kismet.log.type_driver"]["kismet.logfile.type.class"]=="kismet"){
-            console.log("ready to write poi");
-            addPOI();
-        }
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-        console.log("HTTP Request Failed");
-    })
-    .always(function() {
-        /* ... */
-    });
-}
-
-function addPOI() {
-    var dialog = document.getElementById('poidialog');
-
-    if (dialog) {
-        dialog.show();
-    } else {
-        ons.createElement('dialog.html', { append: true })
-        .then(function(dialog) {
-            dialog.show();
-        });
-    }
-};
-
-function hideDialog(id) {
-    document.getElementById(id).hide();
-};
-
-function writePOI() {
-    // console.log("write poi");
-    hideDialog('poidialog');
-
-    var json = {
-        "note":"this is poi test"
-    };
-
-    var postdata = "json=" + JSON.stringify(json);
-
-    $.post("../../poi/create_poi.cmd", data = postdata, dataType = "json");
-}
-
-// timer variables
-var datasource_timer;
-
-// jQuery onLoad function
+// jQuery onLoad
 $(function() {
-    ///// event listeners
-    // init event
-    document.addEventListener('init', function(event) {
-        // login page init
-        if (event.target.matches('#page-login')) {
-            // prepopulate login
-            if ((myuser !== "")||(mypass !== "")) {
-                console.log("populating login form.");
-                document.querySelector('#username').value=myuser;
-                document.querySelector('#password').value=mypass;
-            }
+    kmd.ui.menu = document.getElementById('menu');
+    kmd.ui.navi = document.getElementById('navi');
+    kmd.ui.navi.addEventListener('postpush', kmd.pageChanged)
+    kmd.ui.navi.addEventListener('postpop', kmd.pageChanged)
 
-            // set up prompt message
-            kismet_ui_base.ProvisionedPasswordCheck( function(code) {
-                //console.log("return code:"+code);
-                if (code == 200 || code == 406) {
-                    $.get("../../system/user_status.json")
-                        .done(function(data) {
-                            system_user = data['kismet.system.user'];
-                            if (event.target.matches('#page-login')) {
-                                $("#login-header")
-                                    .text('Kismet requires a login to access data.');
-                                $("#login-prompt")
-                                    .html('Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.');
-                            }
-                        })
-                        .fail(function() {
-                            console.log("HTTP Request for 'user_status.json' Failed");
-                        })
-                } else {
-                    $.get("../../system/user_status.json")
-                        .done(function(data) {
-                            system_user = data['kismet.system.user'];
-                            if (event.target.matches('#page-login')) {
-                                $("#login-header")
-                                    .text('To finish setting up Kismet, you need to configure a login.');
-                                $("#login-prompt")
-                                    .html('This login will be stored in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as ' + system_user + ', and the login will be saved in <code>~' + system_user + '/.kismet/kismet_httpd.conf</code>.');
-                                $("#login-title").text("Create Login");
-                                $("#login-button").attr('onclick', '').click(loginCreate);
-                            };
-                        })
-                        .fail(function() {
-                            console.log("HTTP Request for 'user_status.json' Failed");
-                        })
-                }
-            });
-        } // home init
-        else if (event.target.matches('#home')) {
-            $('#channels').channels();
-        }
-    }, false);
-    // show event
-    document.addEventListener('show', function(event) {
-        if (event.target.matches('#datasources-page')) {
-            list_datasources();
-        }
-    }, false);
-
-    // hide event
-    document.addEventListener('hide', function(event) {
-        if (event.target.matches('#datasources-page')) {
-            clearTimeout(datasource_timer);
-        }
-    }, false);
-
-    // check if we need to login
-    checkSession();
+    kmd_login.checkSession();
 });
 
 </script>
@@ -568,42 +40,54 @@ $(function() {
 <body>
 
 <ons-splitter>
-    <ons-splitter-side id="menu" side="left" width="220px" collapse swipeable>
+    <ons-splitter-side id="menu" side="right" width="220px" collapse swipeable>
         <ons-page>
             <ons-list>
-                <ons-list-item onclick="fn.load('home.html')" tappable>
+                <ons-list-item onclick="kmd.ui.go_home()" tappable>
                     <ons-icon icon="fa-home" class="icon-nav-menu"></ons-icon>
                     Home
                 </ons-list-item>
-                <ons-list-item onclick="fn.load('datasources.html')" tappable>
+                <ons-list-item onclick="kmd.ui.push_page('datasources.html')" tappable>
                     <ons-icon icon="fa-puzzle-piece" class="icon-nav-menu"></ons-icon>Datasources
                 </ons-list-item>
-                <ons-list-item onclick="fn.load('interfaces.html')" tappable>
+                <ons-list-item onclick="kmd.ui.push_page('interfaces.html')" tappable>
                     <ons-icon icon="fa-code-branch" class="icon-nav-menu"></ons-icon>Interfaces
                 </ons-list-item>
-                <ons-list-item onclick="fn.load('login.html')" tappable>
+                <ons-list-item onclick="kmd_login.showLogin();" tappable>
                     <ons-icon icon="fa-key" class="icon-nav-menu"></ons-icon>Login
                 </ons-list-item>
             </ons-list>
         </ons-page>
     </ons-splitter-side>
     <ons-splitter-content>
-            <ons-navigator id="navi" page="home.html"></ons-navigator>
+            <ons-navigator id="navi" page="home-page"></ons-navigator>
     </ons-splitter-content>
 </ons-splitter>
 
-<template id="home.html">
+<template id="login-page">
+    <ons-dialog id="login-dialog">
+        <div id="login-content" class="login-text"></div>
+    </ons-dialog>
+</template>
+<template id="token-page">
+    <ons-dialog id="token-dialog">
+        <div id="token-content" class="login-text"></div>
+    </ons-dialog>
+</template>
+
+<template id="home-page">
     <ons-page id="home">
         <ons-toolbar>
-            <div class="left">
-                <ons-toolbar-button onclick="fn.open()">
-                    <ons-icon icon="md-menu"></ons-icon>
-                </ons-toolbar-button>
-            </div>
             <div class="center">
                 <ons-icon icon="fa-home" class="icon-header-bar"></ons-icon>Home
             </div>
+            <div class="right">
+                <ons-toolbar-button onclick="kmd.ui.menu.open()">
+                    <ons-icon icon="md-menu"></ons-icon>
+                </ons-toolbar-button>
+            </div>
         </ons-toolbar>
+
         <div class="center">
             <div class="card">
                 <ons-row class="card-header">
@@ -613,7 +97,7 @@ $(function() {
                     <ons-col></ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col class="bignum"><span id="numsources">-</span>/<span id="numsources_t">-</span><br><span class="subtitle" id="SourceErrors">Active/Total Sources</span><br></ons-col>
+                    <ons-col class="bignum"><span id="numsources">-</span>/<span id="numsources_total">-</span><br><span class="subtitle" id="SourceErrors">Active/Total Sources</span><br></ons-col>
                     <ons-col class="bignum"><span id="numchans">-</span><br><span class="subtitle">Channels</span></ons-col>
                     <ons-col class="bignum"><span id="numpackets">-</span>
                         <br><span class="subtitle">Packets/sec</span>
@@ -628,12 +112,12 @@ $(function() {
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col class="bignum"><span id="num802Aps_d" onclick="getDev_byType('Wi-Fi AP')" class="show-clickable">-</span><br><span class="subtitle">APs</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Clients_d" onclick="getDev_byType('Wi-Fi Client')" class="show-clickable">-</span><br><span class="subtitle">Clients</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Devices_d" onclick="getDev_byType('Wi-Fi Device')" class="show-clickable">-</span><br><span class="subtitle">Devices</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Bridges_d" onclick="getDev_byType('Wi-Fi Bridged')" class="show-clickable">-</span><br><span class="subtitle">Bridged</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Adhoc_d" onclick="getDev_byType('Wi-Fi Ad-Hoc')" class="show-clickable">-</span><br><span class="subtitle">AdHoc </span></ons-col>
-                    <ons-col class="bignum"><span id="num802WDS_d" onclick="getDev_byType('WiFi WDS')" class="show-clickable">-</span><br><span class="subtitle">WDS </span></ons-col>
+                    <ons-col class="bignum"><span id="num802Aps" onclick="getDev_byType('Wi-Fi AP')" class="show-clickable">-</span><br><span class="subtitle">APs</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Clients" onclick="getDev_byType('Wi-Fi Client')" class="show-clickable">-</span><br><span class="subtitle">Clients</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Devices" onclick="getDev_byType('Wi-Fi Device')" class="show-clickable">-</span><br><span class="subtitle">Devices</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Bridges" onclick="getDev_byType('Wi-Fi Bridged')" class="show-clickable">-</span><br><span class="subtitle">Bridged</span></ons-col>
+                    <ons-col class="bignum"><span id="num802Adhoc" onclick="getDev_byType('Wi-Fi Ad-Hoc')" class="show-clickable">-</span><br><span class="subtitle">AdHoc </span></ons-col>
+                    <ons-col class="bignum"><span id="num802WDS" onclick="getDev_byType('WiFi WDS')" class="show-clickable">-</span><br><span class="subtitle">WDS </span></ons-col>
                 </ons-row>
             </div>
             <div class="card">
@@ -648,6 +132,7 @@ $(function() {
                             <!-- channels div height set based on previous use of object
                                 with html file which seemed to default to 150px (no clear
                                 documentation). this is arbitrary and needs a better solution -->
+                            <canvas id="channel_chart" width="100%" height="100%"></canvas>
                         </div>
                     </ons-col>
                 </ons-row>
@@ -659,8 +144,8 @@ $(function() {
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col class="bignum"><span id="numBTLE_d" onclick="getDev_byType('BTLE')" class="show-clickable">-</span><br><span class="subtitle">BTLE Devices</span></ons-col>
-                    <ons-col class="bignum"><span id="numBR_d" onclick="getDev_byType('BREDR')" class="show-clickable">-</span><br><span class="subtitle">BR/EDR Devices</span></ons-col>
+                    <ons-col class="bignum"><span id="numBTLE" onclick="getDev_byType('BTLE')" class="show-clickable">-</span><br><span class="subtitle">BTLE Devices</span></ons-col>
+                    <ons-col class="bignum"><span id="numBR" onclick="getDev_byType('BREDR')" class="show-clickable">-</span><br><span class="subtitle">BR/EDR Devices</span></ons-col>
                 </ons-row>
             </div>
             <div class="card">
@@ -670,137 +155,22 @@ $(function() {
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col class="bignum"><span id="numRTL433_d">-</span><br><span class="subtitle" onclick="getDev_byType('Sensor')" class="show-clickable">RTL433</span></ons-col>
-                    <ons-col class="bignum"><span id="numRTLADSB_d">-</span><br><span class="subtitle" onclick="getDev_byType('Airplane')" class="show-clickable">ADSB</span></ons-col>
-                    <ons-col class="bignum"><span id="numZWave_d">-</span><br><span class="subtitle" onclick="getDev_byType('ZWave')" class="show-clickable">Z-Wave</span></ons-col>
-                    <ons-col class="bignum"><span id="numMousejack_d">-</span><br><span class="subtitle" onclick="getDev_byType('KB/Mouse')" class="show-clickable">Mousejack</span></ons-col>
-                    <ons-col class="bignum"><span id="numUAV_d">-</span><br><span class="subtitle" onclick="getDev_byType('UAV')" class="show-clickable">UAV</span></ons-col>
-                    <ons-col class="bignum"><span id="numUnknown_d">-</span><br><span class="subtitle">Unknown*</span></ons-col>
-                </ons-row>
-                <ons-row>
-                    <ons-col align="right"><span class="subtitle">(*unkown=Empty kismet.device.basetype)</span></ons-col>
+                    <ons-col class="bignum"><span id="numRTL433">-</span><br><span class="subtitle" onclick="getDev_byType('Sensor')" class="show-clickable">RTL433</span></ons-col>
+                    <ons-col class="bignum"><span id="numRTLADSB">-</span><br><span class="subtitle" onclick="getDev_byType('Airplane')" class="show-clickable">ADSB</span></ons-col>
+                    <ons-col class="bignum"><span id="numRTLAMR">-</span><br><span class="subtitle" onclick="getDev_byType('AMR')" class="show-clickable">AMR</span></ons-col>
+                    <ons-col class="bignum"><span id="numZWave">-</span><br><span class="subtitle" onclick="getDev_byType('ZWave')" class="show-clickable">Z-Wave</span></ons-col>
+                    <ons-col class="bignum"><span id="numMousejack">-</span><br><span class="subtitle" onclick="getDev_byType('KB/Mouse')" class="show-clickable">Mousejack</span></ons-col>
+                    <ons-col class="bignum"><span id="numUAV">-</span><br><span class="subtitle" onclick="getDev_byType('UAV')" class="show-clickable">UAV</span></ons-col>
                 </ons-row>
             </div>
         </div>
         <ons-bottom-toolbar>
-            <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard
-            </h2>
-        </ons-bottom-toolbar>
-    </ons-page>
-</template>
-
-<template id="login.html">
-    <ons-page id="page-login">
-        <ons-toolbar>
-            <div class="left">
-                <ons-toolbar-button onclick="fn.open()">
-                    <ons-icon icon="md-menu"></ons-icon>
-                </ons-toolbar-button>
-            </div>
-            <div id="login-title" class="center">
-                <ons-icon icon="fa-key" class="icon-header-bar"></ons-icon> Login
-            </div>
-        </ons-toolbar>
-        <div class="center">
-            <div id="login-card" class="card">
-                <p id="login-header">Kismet requires a login to access data.</p>
-                <p><ons-input id="username" placeholder="Username" modifier="underbar"></ons-input></p>
-                <p><ons-input id="password" placeholder="Password" type="password" modifier="underbar" ></ons-input></p>
-                <p><ons-button id="login-button" class="show-clickable" onClick="login();">Log in</ons-button></p>
-                <div id="login-prompt" class="card">
-                    Your login is stored in in <code>.kismet/kismet_httpd.conf</code> in the <i>home directory of the user who launched Kismet</i>;  This server is running as root, and the login will be saved in <code>~root/.kismet/kismet_httpd.conf</code>.
-                </div>
-                <ons-bottom-toolbar>
-                    <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
-                </ons-bottom-toolbar>
-            </div>
-        </div>
-    </ons-page>
-</template>
-
-<template id="datasources.html">
-    <ons-page id="datasources-page">
-        <ons-toolbar>
-            <div class="left">
-                <ons-toolbar-button onclick="fn.open()">
-                    <ons-icon icon="md-menu"></ons-icon>
-                </ons-toolbar-button>
-            </div>
-            <div class="center">
-                <ons-icon icon="fa-cog" class="icon-header-bar"></ons-icon>Datasources
-            </div>
-        </ons-toolbar>
-        <div class="center">
-            <div id="datasourceslist"></div>
-            <h5 class="dev-note"> *Datasources listings are refreshed every 10 seconds</h5>
-        </div>
-        <ons-bottom-toolbar>
             <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
         </ons-bottom-toolbar>
-        </ons-toolbar>
+        <ons-fab id="button-pause" position="bottom left" modifier="mini" onclick="kmd.pauseResume()">
+            <ons-icon icon="md-pause"></ons-icon>
+        </ons-fab>
     </ons-page>
-</template>
-
-<template id="interfaces.html">
-    <ons-page>
-        <script>
-            list_interfaces();
-        </script>
-        <ons-toolbar>
-            <div class="left">
-                <ons-toolbar-button onclick="fn.open()">
-                    <ons-icon icon="md-menu"></ons-icon>
-                    <div class="left"></div>
-                </ons-toolbar-button>
-            </div>
-            <div class="center">
-                <ons-icon icon="fa-cog" class="icon-header-bar"></ons-icon>Interfaces
-            </div>
-        </ons-toolbar>
-        <div class="center">
-            <div id="interfaceslist"></div>
-            <h5 class="dev-note"> *Interfaces listings </h5>
-        </div>
-        <ons-bottom-toolbar>
-            <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
-        </ons-bottom-toolbar>
-        </ons-toolbar>
-    </ons-page>
-</template>
-
-<template id="listdevices.html">
-    <ons-page>
-        <ons-toolbar>
-            <div class="left">
-                <ons-back-button>Home</ons-back-button>
-            </div>
-            <div class="center">
-                <ons-icon icon="fa-cog" class="icon-header-bar"></ons-icon>Listing:<span id="listheading"></span>
-            </div>
-        </ons-toolbar>
-        <div class="center">
-            <ons-list>
-                <ons-lazy-repeat id="devlist"></ons-lazy-repeat>
-            </ons-list>
-        </div>
-        <ons-bottom-toolbar>
-            <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
-        </ons-bottom-toolbar>
-        </ons-toolbar>
-    </ons-page>
-</template>
-
-<template id="dialog.html">
-    <ons-alert-dialog modifier="rowfooter" id="poidialog" cancelable>
-        <div class="alert-dialog-title">Add Point of Interest</div>
-        <div class="alert-dialog-content">
-            <ons-input modifier="underbar"></ons-input>
-        </div>
-        <div class="alert-dialog-footer">
-            <button class="alert-dialog-button" onclick="hideDialog('poidialog')">Cancel</button>
-            <button class="alert-dialog-button" onclick="writePOI()">OK</button>
-        </div>
-    </ons-alert-dialog>
 </template>
 
 </body>
