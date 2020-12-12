@@ -1,0 +1,30 @@
+<ons-page id="datasources">
+    <ons-toolbar>
+        <div class="left">
+            <ons-back-button>Back</ons-back-button>
+        </div>
+        <div class="center">
+            <ons-icon icon="fa-cog" class="icon-header-bar"></ons-icon>Datasources
+        </div>
+        <div class="right">
+            <ons-toolbar-button onclick="kmd.ui.menu.open()">
+                <ons-icon icon="md-menu"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+    </ons-toolbar>
+    <ons-pull-hook id="datasource-pull">
+        Pull to refresh
+    </ons-pull-hook>
+    <div class="center">
+        <div id="datasources-list"></div>
+    </div>
+    <div class="center">
+        <div id="datasourceslist"></div>
+    </div>
+    <ons-bottom-toolbar>
+        <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
+    </ons-bottom-toolbar>
+    <ons-fab id="button-pause" position="bottom left" modifier="mini" onclick="kmd.pauseResume()">
+        <ons-icon icon="md-pause"></ons-icon>
+    </ons-fab>
+</ons-page>
