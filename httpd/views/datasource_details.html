@@ -1,0 +1,34 @@
+<ons-page id="datasource_details">
+    <script>
+    $(function() {
+        if (typeof kmd_datasource_details !== 'object') {
+            $.getScript('js/kmd-datasource-details.js');
+        }
+    });
+    </script>
+    <ons-toolbar>
+        <div class="left">
+            <ons-back-button>Back</ons-back-button>
+        </div>
+        <div class="center">
+            <ons-icon icon="fa-cog" class="icon-header-bar"></ons-icon>Datasource Details
+        </div>
+        <div class="right">
+            <ons-toolbar-button onclick="kmd.ui.menu.open()">
+                <ons-icon icon="md-menu"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+    </ons-toolbar>
+    <ons-pull-hook id="datasource-pull">
+        Pull to refresh
+    </ons-pull-hook>
+    <div class="center">
+        <div id="datasource-details"></div>
+    </div>
+    <ons-bottom-toolbar>
+        <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
+    </ons-bottom-toolbar>
+    <ons-fab id="button-pause" position="bottom left" modifier="mini" onclick="kmd.pauseResume()">
+        <ons-icon icon="md-pause"></ons-icon>
+    </ons-fab>
+</ons-page>

@@ -229,7 +229,7 @@ var check_session_cb = function(code) {
     if (code == 200 || code == 406) {
         $.get(kmd_rest_prefix + "system/user_status.json")
             .done(function(data) {
-                var system_user = data['kismet.system.user'];
+                var system_user = kmd.sanitizeHTML(data['kismet.system.user']);
                 if (code == 406)
                     create_login_dialog({
                         header: 'Kismet requires a login to access data.',
@@ -251,7 +251,7 @@ var check_session_cb = function(code) {
     } else {
         $.get(kmd_rest_prefix + "system/user_status.json")
             .done(function(data) {
-                var system_user = data['kismet.system.user'];
+                var system_user = kmd.sanitizeHTML(data['kismet.system.user']);
                 create_login_dialog({
                     header: 'To finish setting up Kismet, you need to configure a login.',
                     button: 'Create Login',

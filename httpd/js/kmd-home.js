@@ -14,17 +14,20 @@ exports.refreshStatus = function() {
     $.ajax({
             url: kmd_rest_prefix + "system/status.json",
             type: "POST",
-            data: { "json": '{"fields":["kismet.system.timestamp.sec","kismet.system.timestamp.start_sec",'+
-                                '"kismet.system.devices.count","kismet.device.packets_rrd"]}' }
+            data: { "json": '{"fields":[["kismet.system.timestamp.sec","ts_sec"],' +
+                                       '["kismet.system.timestamp.start_sec","start_sec"],' +
+                                       '["kismet.system.devices.count","devices"],' +
+                                       '["kismet.device.packets_rrd/kismet.common.rrd.last_time","last_time"],' +
+                                       '["kismet.device.packets_rrd/kismet.common.rrd.minute_vec","vector"]}' }
     })
     .done(function(data, textStatus, jqXHR) {
-        var utime = Math.round((data['kismet.system.timestamp.sec'] - data['kismet.system.timestamp.start_sec']) / 60);
+        var utime = Math.round((data['ts_sec'] - data['start_sec']) / 60);
         utime = " Uptime: " + utime + " minutes.";
 
-        var devices = data['kismet.system.devices.count'];
+        var devices = data['devices'];
 
-        var now = (data['kismet.device.packets_rrd']['kismet.common.rrd.last_time'] - 1) % 60;
-        var packets = data['kismet.device.packets_rrd']['kismet.common.rrd.minute_vec'][now];
+        var now = (data['last_time'] - 1) % 60;
+        var packets = data['vector'][now];
 
         $('#uptime').text(utime);
         $('#numdevs').text(devices);
@@ -42,7 +45,9 @@ exports.refreshSources = function() {
     $.ajax({
             url: kmd_rest_prefix + "datasource/all_sources.json",
             type: "POST",
-            data: { "json": '{"fields":[["kismet.datasource.running","running"],["kismet.datasource.channels","channels"],["kismet.datasource.error","error"]]}' }
+            data: { "json": '{"fields":[["kismet.datasource.running","running"],' +
+                                       '["kismet.datasource.channels","channels"],' +
+                                       '["kismet.datasource.error","error"]]}' }
     })
     .done(function(data) {
         var sources = data.filter(function(data) { return data['running'] == "1" }).length;
@@ -102,7 +107,7 @@ exports.refreshViews = function() {
             url: kmd_rest_prefix + "devices/views/all_views.json",
             type: "POST",
             data: { "json": '{"fields":[["kismet.devices.view.size","view_size"],'+
-                                    '["kismet.devices.view.id","view_id"]]}' }
+                                       '["kismet.devices.view.id","view_id"]]}' }
     })
     .done(function(data, textStatus, jqXHR) {
         $('#numBTLE').text(data.filter(function(data) { return data['view_id'] == "phy-BTLE" })[0]['view_size']);

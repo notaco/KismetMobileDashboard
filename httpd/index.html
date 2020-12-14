@@ -13,7 +13,6 @@
 <script src="js/kmd-login.js"></script>
 <script src="js/kmd-home.js"></script>
 <script src="js/kmd-channelgraph.js"></script>
-<script src="js/kmd-datasource.js"></script>
 
 <link rel="stylesheet" href="css/onsenui.min.css">
 <link rel="stylesheet" href="css/onsen-css-components.min.css">
@@ -28,8 +27,8 @@ var kmd_rest_prefix = "../../"
 $(function() {
     kmd.ui.menu = document.getElementById('menu');
     kmd.ui.navi = document.getElementById('navi');
-    kmd.ui.navi.addEventListener('postpush', kmd.pageChanged)
-    kmd.ui.navi.addEventListener('postpop', kmd.pageChanged)
+    kmd.ui.navi.addEventListener('postpush', kmd.pageChanged);
+    kmd.ui.navi.addEventListener('postpop', kmd.pageChanged);
 
     kmd_login.checkSession();
 });
@@ -47,7 +46,7 @@ $(function() {
                     <ons-icon icon="fa-home" class="icon-nav-menu"></ons-icon>
                     Home
                 </ons-list-item>
-                <ons-list-item onclick="kmd.ui.push_page('datasources.html')" tappable>
+                <ons-list-item onclick="kmd.ui.push_page('views/datasources_list.html')" tappable>
                     <ons-icon icon="fa-puzzle-piece" class="icon-nav-menu"></ons-icon>Datasources
                 </ons-list-item>
                 <ons-list-item onclick="kmd.ui.push_page('interfaces.html')" tappable>

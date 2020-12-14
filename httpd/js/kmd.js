@@ -13,9 +13,12 @@ exports.ui = {
         if (cnt > 0)
             exports.ui.navi.popPage({ animation: 'none', times: cnt });
     },
-    push_page: function(page) {
+    push_page: function(page, data_obj) {
+        if (typeof data_obj !== 'object')
+            data_obj = {};
         exports.ui.menu.close();
-        exports.ui.navi.pushPage(page, { animation: 'none' });
+        if (! page.includes(exports.ui.navi.topPage.id))
+            exports.ui.navi.pushPage(page, { animation: 'none', data: data_obj });
     },
     alert: function(message) {
         ons.notification.toast(message, { timeout: 1000, animation: 'fall' })
@@ -105,9 +108,29 @@ var handleVisibilityChange = function() {
 if (typeof document.addEventListener === "undefined" || hidden === undefined) {
     ; // Do nothing
 } else {
-      // Handle page visibility change   
-      document.addEventListener(visibilityChange, handleVisibilityChange, false);
+    // Handle page visibility change   
+    document.addEventListener(visibilityChange, handleVisibilityChange, false);
 }
+
+// function to sanitize strings for html use, from kismet web ui (js/kismet.utils.js)
+
+exports.sanitizeHTML = function(s) {
+    var remap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+        '`': '&#x60;',
+        '=': '&#x3D;',
+        '/': '&#x2F;'
+    };
+
+    return String(s).replace(/[&<>"'`=\/]/g, function (s) {
+            return remap[s];
+    });
+}
+
 
 return exports;
 });

@@ -1,4 +1,11 @@
-<ons-page id="datasources">
+<ons-page id="datasources_list">
+    <script>
+    $(function() {
+        if (typeof kmd_datasources_list !== 'object') {
+            $.getScript('js/kmd-datasources-list.js');
+        }
+    });
+    </script>
     <ons-toolbar>
         <div class="left">
             <ons-back-button>Back</ons-back-button>
@@ -12,14 +19,8 @@
             </ons-toolbar-button>
         </div>
     </ons-toolbar>
-    <ons-pull-hook id="datasource-pull">
-        Pull to refresh
-    </ons-pull-hook>
     <div class="center">
         <div id="datasources-list"></div>
-    </div>
-    <div class="center">
-        <div id="datasourceslist"></div>
     </div>
     <ons-bottom-toolbar>
         <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
