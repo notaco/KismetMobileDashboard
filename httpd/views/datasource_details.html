@@ -19,12 +19,71 @@
             </ons-toolbar-button>
         </div>
     </ons-toolbar>
-    <ons-pull-hook id="datasource-pull">
-        Pull to refresh
-    </ons-pull-hook>
-    <div class="center">
-        <div id="datasource-details"></div>
-    </div>
+    <ons-row>
+        <ons-col>
+            <ons-list>
+                <ons-list-header>Info: <span id="dsd-uuid"></span></ons-list-header>
+                <ons-list-item>
+                    <div class="center">
+                        Datasource name:
+                    </div>
+                    <div class="right" id="dsd-name"></div>
+                </ons-list-item>
+                <ons-list-item>
+                    <div class="center">
+                        Interface:
+                    </div>
+                    <div class="right" id="dsd-interface"></div>
+                </ons-list-item>
+                <ons-list-item>
+                    <div class="center">
+                        Driver type:
+                    </div>
+                    <div class="right" id="dsd-driver"></div>
+                </ons-list-item>
+                <ons-list-item>
+                    <div class="center">
+                        Hardware:
+                    </div>
+                    <div class="right" id="dsd-hardware"></div>
+                </ons-list-item>
+                <ons-list-item>
+                    <div class="center">
+                        Packets:
+                    </div>
+                    <div class="right" id="dsd-packets"></div>
+                </ons-list-item>
+                <ons-list-header>Status: <span id="dsd-state"></span></ons-list-header>
+                <ons-list-item>
+                    <div class="center">
+                        Active:
+                    </div>
+                    <div class="right">
+                        <ons-switch id="dsd-active" modifier="material"></ons-switch>
+                    </div>
+                </ons-list-item>
+                <ons-list-item>
+                    <div class="center">
+                        Hopping:
+                    </div>
+                    <div class="right">
+                        <ons-switch id="dsd-hopping" modifier="material"></ons-switch>
+                    </div>
+                </ons-list-item>
+                <ons-list-item>
+                    <div class="center">
+                        <span id="dsd-channels-title">Channels:</span>
+                    </div>
+                    <div class="right" id="dsd-channels"></div>
+                </ons-list-item>
+                <ons-list-item id="dsd-chan-hopping">
+                    <fieldset class="chan-list">
+                        <ul class="chan-list" id="dsd-chan-list"></ul>
+                    </fieldset>
+                </ons-list-item>
+            </ons-list>
+        </ons-col>
+    </ons-row>
     <ons-bottom-toolbar>
         <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
     </ons-bottom-toolbar>

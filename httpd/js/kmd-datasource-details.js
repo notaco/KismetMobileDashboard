@@ -8,6 +8,202 @@ var exports = {};
 var page_id = 'datasource_details';
 kmd.timers[page_id] = {};
 var timers = kmd.timers[page_id];
+var state = { current: {} };
+
+// regex to clean chan name for jquery
+var jQclean = function( chan_id ) {
+    return chan_id.replace( /[-\+]$/g, "" );
+}
+
+var pause_restart = function() {
+    clearTimeout(timers['updates'].timeout);
+
+    state.current['status_text'] = 'Changing...';
+    $("#dsd-state").text(state.current['status_text']);
+
+    if (state.current['status_bool'])
+        var cmd = "pause_source.cmd";
+    else
+        var cmd = "resume_source.cmd";
+
+    $.ajax({
+        url: kmd_rest_prefix + "datasource/by-uuid/" + state.current['uuid'] + '/' + cmd,
+        type: "GET"
+    })
+    .done(function(data, textStatus, jqXHR) {
+        kmd.ui.alert("Pause/Restart request successful!");
+        exports.listDetails();
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        kmd.ui.alert("Pause/Restart failed!");
+        exports.listDetails();
+    });
+};
+
+var form_set_channels = function() {
+    clearTimeout(timers['updates'].timeout);
+    var cmd_dict = {};
+    if ($('#dsd-hopping').prop("checked")) {
+        if ($("ons-checkbox input:checked").length === 0) {
+            kmd.ui.alert("Empty channel set!");
+            exports.listDetails();
+            return false;
+        }
+        cmd_dict['channels'] = [];
+        for (var chan of $("ons-checkbox input:checked"))
+            cmd_dict['channels'].push(chan.value);
+    } else {
+        cmd_dict['channel'] = $("#dsd-chan-select option:selected").text();
+    }
+
+    $.ajax({
+        url: kmd_rest_prefix + "datasource/by-uuid/" + state.current['uuid'] + "/set_channel.cmd",
+        type: "POST",
+        data: encodeURIComponent("json=" + JSON.stringify(cmd_dict))
+    })
+    .done(function(data, textStatus, jqXHR) {
+        kmd.ui.alert("Set channel request successful!");
+        state.ignore_refresh = false;
+        state.current['uuid'] = '';
+        exports.listDetails();
+        $('#dsd-channels-ctrls').hide();
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        kmd.ui.alert("Set channel failed!");
+        exports.listDetails();
+    });
+};
+
+var form_revert = function() {
+    state.ignore_refresh = false;
+    state.current['uuid'] = '';
+    clearTimeout(timers['updates'].timeout);
+    exports.listDetails();
+    $('#dsd-channels-ctrls').hide();
+};
+
+var show_submit = function() {
+    if ( $('#dsd-channels-ctrls').length === 0 ) {
+        $('#dsd-channels-title').after(
+            $("<span>", { id: "dsd-channels-ctrls",
+                          class: "field-label show-clickable"
+            })
+        );
+        $('#dsd-channels-ctrls').append(
+            $("<span>", { text: "Apply" })
+            .click(form_set_channels)
+        );
+        $('#dsd-channels-ctrls').append(" | ");
+        $('#dsd-channels-ctrls').append(
+            $("<span>", { text: "Revert" })
+            .click(form_revert)
+        );
+    } else
+        $('#dsd-channels-ctrls').show();
+};
+
+var hop_change = function() {
+    if ( $('#dsd-hopping').prop("checked") )
+        channels_details( {show_hop: true} );
+    else
+        channels_details( {show_lock: true} );
+    show_submit();
+};
+
+var channels_details = function(opts) {
+    if (opts['show_hop'] || opts['show_lock'])
+        state.ignore_refresh = true;
+    else if (state.ignore_refresh)
+        return true;
+
+    if (typeof opts['data'] !== 'undefined')
+        var dev_details = opts['data'];
+    else
+        var dev_details = state[state.current['uuid']];
+
+    if ( dev_details['uuid'] !== state.current['uuid'] ||
+         dev_details['hopping'] !== state.current['hopping'] ||
+         opts['show_hop'] || opts['show_lock'] ) {
+        if ( (dev_details['hopping'] && ! opts['show_lock']) || opts['show_hop'] )
+            $("#dsd-channels-title").text("Channels:");
+        else
+            $("#dsd-channels-title").text("Channel:");
+    }
+
+    if ( (dev_details['hopping'] && ! opts['show_lock']) || opts['show_hop'] ) {
+        if ($('#dsd-chan-all').length === 1)
+            if ( dev_details['hop_channels'].length !== dev_details['channels'].length )
+                $('#dsd-chan-all').addClass("button--outline");
+            else
+                $('#dsd-chan-all').removeClass("button--outline");
+        else {
+            $('#dsd-channels').html(
+                $('<button>', {
+                    id: "dsd-chan-all",
+                    html: "All",
+                    class: dev_details['hop_channels'].length === dev_details['channels'].length ? 
+                            "show-clickable button" : "show-clickable button button--outline",
+                    disabled: (dev_details["paused"] == 1 || dev_details["running"] == 0)
+                }).click(function() {
+                    for (var chan of state[state.current['uuid']]['channels'])
+                        $('#dsd-chan-' + jQclean(chan)).prop('checked', true);
+                    show_submit();
+                }));
+            $('#dsd-channels').append(
+                $('<button>', {
+                    id: "dsd-chan-none",
+                    html: "None",
+                    class: "show-clickable button--quiet",
+                    disabled: (dev_details["paused"] == 1 || dev_details["running"] == 0)
+                }).click(function() {
+                    for (var chan of state[state.current['uuid']]['channels'])
+                        $('#dsd-chan-' + jQclean(chan)).prop('checked', false);
+                    show_submit();
+                }));
+        }
+
+        if ( state.current['uuid'] !== dev_details['uuid'] ||
+             dev_details['channels'].length !== $('#dsd-chan-list li').length ) {
+            $('#dsd-chan-list').empty();
+            for (var chan of dev_details['channels']) {
+                $('#dsd-chan-list').append(
+                    $('<li>').html(
+                        $('<ons-checkbox>', { id: 'dsd-chan-' + jQclean(chan),
+                                            value: chan,
+                                            checked: dev_details['hop_channels'].includes(chan) ? true : false,
+                                            modifier: "material"} )
+                        .on("change", show_submit)
+                    ).append($('<label>', { for: 'dsd-chan-cb-' + jQclean(chan) } ).text(" " + chan))
+                );
+            }
+        } else {
+            for (var chan of dev_details['channels']) {
+                if (dev_details['hop_channels'].includes(chan))
+                    $('#dsd-chan-' + jQclean(chan)).prop('checked', true);
+                else
+                    $('#dsd-chan-' + jQclean(chan)).prop('checked', false);
+            }
+        }
+
+        $('#dsd-chan-hopping').show();
+    } else {
+        $('#dsd-chan-hopping').hide();
+        if ( dev_details['uuid'] !== state.current['uuid'] ||
+             $('option').length !== dev_details['channels'].length) {
+            $('#dsd-channels').html(
+                $('<ons-select>', { id: 'dsd-chan-select',
+                                    modifier: 'underbar' })
+                .on("change", show_submit)
+            );
+            for (var chan of dev_details['channels'])
+                $('#dsd-chan-select').append(
+                    $('<option>', { id: 'dsd-chan-opt-' + jQclean(chan) }).text(chan));
+            $('#dsd-chan-opt-' + jQclean(dev_details['channel'])).prop('selected', true);
+        } else {
+            $('#dsd-chan-opt-' + jQclean(dev_details['channel'])).prop('selected', true);
+        }
+    }
+}
 
 exports.listDetails = function() {
     if (kmd.paused || (page_id !== kmd.ui.navi.topPage.id))
@@ -34,195 +230,89 @@ exports.listDetails = function() {
             data: { "json": '{"fields":' + JSON.stringify(source_fields) + '}'}
     })
     .done(function(data, textStatus, jqXHR) {
-        $('#datasource-details').empty();
-
+        if ( $("#datasource_details").data()['uuid'] !== dev_uuid )
+            state.current['uuid'] = '';
         var uuid = data["uuid"];
-        var hopping = data['hopping'] == 1;
-        var channels = data['channels'];
 
-        var sourceState = "";
-        var switchState = false;
-        if (data["paused"] == 1 && data["running"] == 1) {
-            sourceState = "Paused";
-        } else if (data["paused"] == 0 && data["running"] == 1) {
-            sourceState = "Running";
-            switchState = true;
+        var status_text = "Paused";
+        var status_bool = false;
+        if (data["paused"] == 0 && data["running"] == 1) {
+            status_text = "Running";
+            status_bool = true;
         } 
         if (data["error"] == 1) {
-            sourceState = "Error";
+            status_text = "Error";
         }
 
-        var hop_channels = [];
-        if (! hopping) {
-            hop_channels[0] = data['channel'];
-        } else {
-            hop_channels = data['hop_channels'];
+        // textual setup for uuid
+        if (uuid !== state.current['uuid']) {
+            $("#dsd-uuid").text(kmd.sanitizeHTML(uuid));
+            $("#dsd-name").text(kmd.sanitizeHTML(data["name"]));
+            $("#dsd-interface").text(kmd.sanitizeHTML(data["capture_interface"]));
+            $("#dsd-driver").text(kmd.sanitizeHTML(data["type"]));
+            $("#dsd-hardware").text(kmd.sanitizeHTML(data["hardware"]));
         }
-        var channel_buttons = $('<span>')
-                                .append(
-                                    $('<button>', {
-                                        html: "All",
-                                        class: "button-group button button--outline",
-                                        disabled: (! switchState) || (! hopping) 
-                                    }).click(function() {
-                                        
-                                    })
-                                );
-        for (var chan of channels) {
-            var button_class = "button-group button";
-            if (! hop_channels.includes(chan) ) {
-                button_class += " button--outline";
+        // textual refresh for packets and status
+        if (uuid !== state.current['uuid'] || data["num_packets"] !== state[uuid]["num_packets"])
+            $("#dsd-packets").text(kmd.sanitizeHTML(data["num_packets"]));
+        if ($("#dsd-state").text() !== status_text)
+            $("#dsd-state").text(status_text);
+
+        // form state for active and hopping switches
+        if ( uuid !== state.current['uuid'] || status_bool !== state.current['status_bool'] ) {
+            if ( status_bool ) {
+                $('#dsd-active').prop('checked', true);
+                $('#dsd-hopping, button, fieldset, #dsd-chan-select').prop("disabled", false);
+            } else {
+                $('#dsd-active').prop('checked', false);
+                $('#dsd-hopping, button, fieldset, #dsd-chan-select').prop("disabled", true);
             }
-            channel_buttons.append(
-                $('<button>', {
-                    html: chan,
-                    class: button_class,
-                    disabled: ! switchState
-                }).click( function() {
-                    if ( hopping ) {
-                        console.log("hopping");
-                    } else {
-                        console.log("lock");
-                    }
-                })
-            );
         }
-        
-        $('#datasource-details').append(
-            $('<ons-card>', { id: uuid })
-                .append($('<ons-row>', { class: 'centered' })
-                    .append($('<ons-col>')
-                        .append($('<span>', { class: 'card-icon' })
-                            .text(data["name"]))
-                    )
-                )
-                .append($('<ons-row>')
-                    .append($('<ons-col>')
-                        .append($('<span>', { class: 'field-label' }).text('Interface: '))
-                        .append(data["capture_interface"])
-                    )
-                )
-                .append($('<ons-row>')
-                    .append($('<ons-col>')
-                        .append($('<span>', { class: 'field-label' }).text('Driver Type: '))
-                        .append(data["type"])
-                    )
-                )
-                .append($('<ons-row>')
-                    .append($('<ons-col>')
-                        .append($('<span>', { class: 'field-label' }).text('Hardware: '))
-                        .append(data["hardware"])
-                    )
-                )
-                .append($('<ons-row>')
-                    .append($('<ons-col>')
-                        .append($('<span>', { class: 'field-label' }).text('UUID: '))
-                        .append(uuid)
-                    )
-                )
-                .append($('<ons-row>')
-                    .append($('<ons-col>')
-                        .append($('<span>', { class: 'field-label' }).text('Packets: '))
-                        .append(data['num_packets'])
-                    )
-                )
-                .append($('<ons-row>')
-                    .append($('<ons-col>')
-                        .append($('<span>', { class: 'field-label' }).text('Active: '))
-                        .append(
-                            $('<ons-switch>', {
-                                id: "state-switch",
-                                modifier: "material",
-                                onChange: "datasource_pause_restart('" + uuid + "','" + sourceState + "')",
-                                checked: switchState
-                                }
-                            )
-                        )
-                    )
-                )
-                .append($('<ons-row>')
-                    .append($('<ons-col>')
-                        .append($('<span>', { class: 'field-label' }).text('Hopping: '))
-                        .append(
-                            $('<ons-switch>', {
-                                id: "state-switch",
-                                modifier: "material",
-                                disabled: ! switchState,
-                                checked: hopping
-                                }
-                            ).on('change', function() {
-                                if (hopping) {
-                                    var encodeData = "json=" + encodeURIComponent(JSON.stringify({
-                                        "cmd": "lock",
-                                        "channel": channels[0],
-                                        "uuid": uuid,
-                                    }));
+        if ( state.ignore_refresh !== true &&
+             ( uuid !== state.current['uuid'] || data['hopping'] !== state.current['hopping'] ) )
+            if ( data['hopping'] ) {
+                $('#dsd-hopping').prop('checked', true);
+            } else {
+                $('#dsd-hopping').prop('checked', false);
+            }
 
-                                    datasource_channels(uuid, encodeData);
-                                } else {
-                                    var encodeData = "json=" + encodeURIComponent(JSON.stringify({
-                                        "cmd": "hop",
-                                        "channels": channels,
-                                        "uuid": uuid
-                                    }));
+        if ( uuid !== state.current['uuid'] ||
+             typeof state[uuid] === 'undefined' ||
+             status_bool !== state.current['status_bool'] ||
+             data['hopping'] !== state[uuid]['hopping'] ||
+             data['channel'] !== state[uuid]['channel'] ||
+             data['hop_channels'].length !== state[uuid]['hop_channels'].length ) {
+            channels_details({ data: data });
+        }
 
-                                    datasource_channels(uuid, encodeData);
-                                }
-                            })
-                        )
-                    )
-                )
-                .append($('<ons-row>')
-                    .append($('<ons-col>')
-                        .append($('<span>', { class: 'field-label' }).text('Channels: '))
-                        .append(channel_buttons)
-                    )
-                )
-        );
+        $("#datasource_details").data("uuid", dev_uuid)
+        state.current['uuid'] = dev_uuid;
+        state.current['status_text'] = status_text;
+        state.current['status_bool'] = status_bool;
+        state[uuid] = data;
     })
     .always(function() {
-        timers['all'].timeout = setTimeout(exports.listDetails, 5000);
+        timers['updates'].timeout = setTimeout(exports.listDetails, 5000);
     });
 }
-timers['all'] = { fn: exports.listDetails };
+timers['updates'] = { fn: exports.listDetails };
 
 // start on dynamic load
 exports.listDetails();
 
-exports.datasource_pause_restart = function(uuid, sourceState) {
-    // console.log("pause restart called");
-    var cmd = "";
-
-    if (sourceState == "Running") {
-        cmd = kmd_rest_prefix + "pause_source.cmd";
-    } else {
-        cmd = kmd_rest_prefix + "resume_source.cmd";
+// form event handlers
+var form_handlers = function() {
+    $('#dsd-active').on("change", pause_restart);
+    $('#dsd-hopping').on("change", hop_change);
+};
+// add on page load
+form_handlers();
+// readd on following page loads
+document.addEventListener('show', function(event) {
+    if ( event.target.id === 'datasource_details' ) {
+        form_handlers();
     }
-
-    jQuery.ajax({
-        url: kmd_rest_prefix + "datasource/by-uuid/" + uuid + cmd,
-        type: "GET",
-        headers: {},
-    })
-    .done(function(data, textStatus, jqXHR) {
-        // console.log("HTTP Request Succeeded: " + jqXHR.status);
-        list_datasources();
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-        //    console.log("HTTP Request Failed");
-        kmd.ui.alert("Pause/Restart failed");
-    })
-}
-
-exports.datasource_channels = function(uuid, postdata) {
-    $.post(kmd_rest_prefix + "datasource/by-uuid/" + uuid + "/set_channel.cmd", postdata, "json")
-        .done(function(data, textStatus, jqXHR) {
-            list_datasources();
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            kmd.ui.alert("Set channels failed!");
-        })
-}
+}, false);
 
 return exports;
 });

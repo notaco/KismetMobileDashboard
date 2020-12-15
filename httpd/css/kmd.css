@@ -1,4 +1,3 @@
- 
 #uptime {
     color: black;
 }
@@ -100,3 +99,46 @@
 .error {
     color: #ff0000;
 }
+
+fieldset.chan-list  { 
+  margin: 0; 
+  padding: 0; 
+  margin-bottom: 1.25em; 
+  padding: .125em; 
+} 
+
+fieldset.chan-list legend { 
+  margin: 0; 
+  padding: 0; 
+  font-weight: bold; 
+  margin-left: 20px; 
+  font-size: 100%; 
+  color: black; 
+} 
+
+ul.chan-list  { 
+  margin: 0; 
+  padding: 0; 
+  margin-left: 20px; 
+  list-style: none; 
+} 
+
+ul.chan-list li input { 
+  margin-right: .25em; 
+} 
+
+ul.chan-list li { 
+  border: 1px transparent solid; 
+  display:inline-block;
+  width:12em;
+} 
+
+ul.chan-list li label { 
+  margin-left: ; 
+} 
+ul.chan-list li:hover, 
+ul.chan-list li.focus  { 
+  background-color: lightblue; 
+  border: 1px gray solid; 
+  width: 12em; 
+} 
