@@ -15,6 +15,32 @@ var jQclean = function( chan_id ) {
     return chan_id.replace( /[-\+]$/g, "" );
 }
 
+// hop_rate convertor adapted from kismet ui /js/kismet.ui.datasources.js
+/* Convert a hop rate to human readable */
+var hop_to_human = function(hop) {
+    if (hop >= 1) {
+        hop = Math.round(hop*100)/100
+        return hop + "/second";
+    }
+
+    var s = (hop / (1/60));
+    s = Math.round(s*100)/100
+
+    return s + "/minute";
+};
+
+var hop_rate_from_min = function(hm) {
+    var hr = (1 / (60/hm));
+    return hr;
+};
+
+var hop_rate_selector = function(hr) {
+    if (hr >= 1)
+        return [Math.round(hr), 'sec'];
+    else
+        return [Math.round(hr / (1/60)), 'min'];
+};
+
 var pause_restart = function() {
     clearTimeout(timers['updates'].timeout);
 
@@ -44,14 +70,19 @@ var form_set_channels = function() {
     clearTimeout(timers['updates'].timeout);
     var cmd_dict = {};
     if ($('#dsd-hopping').prop("checked")) {
-        if ($("ons-checkbox input:checked").length === 0) {
+        if ($("#dsd-chan-list ons-checkbox input:checked").length === 0) {
             kmd.ui.alert("Empty channel set!");
             exports.listDetails();
             return false;
         }
         cmd_dict['channels'] = [];
-        for (var chan of $("ons-checkbox input:checked"))
+        for (var chan of $("#dsd-chan-list ons-checkbox input:checked"))
             cmd_dict['channels'].push(chan.value);
+        cmd_dict['shuffle'] = $('#dsd-shuffle-cb').prop('checked');
+        if ($('#dsd-hr-period option:selected').val() === 'sec')
+            cmd_dict['rate'] = parseInt($('#dsd-hr-value option:selected').val());
+        else
+            cmd_dict['rate'] = hop_rate_from_min($('#dsd-hr-value option:selected').val());
     } else {
         cmd_dict['channel'] = $("#dsd-chan-select option:selected").text();
     }
@@ -64,7 +95,7 @@ var form_set_channels = function() {
     .done(function(data, textStatus, jqXHR) {
         kmd.ui.alert("Set channel request successful!");
         state.ignore_refresh = false;
-        state.current['uuid'] = '';
+//        state.current['uuid'] = '';
         exports.listDetails();
         $('#dsd-channels-ctrls').hide();
     })
@@ -76,9 +107,9 @@ var form_set_channels = function() {
 
 var form_revert = function() {
     state.ignore_refresh = false;
-    state.current['uuid'] = '';
-    clearTimeout(timers['updates'].timeout);
-    exports.listDetails();
+    $('#dsd-advanced').remove();
+    $('#dsd-hopping').prop('checked', (state[state.current['uuid']]['hopping'] == 1));
+    channels_details( {} );
     $('#dsd-channels-ctrls').hide();
 };
 
@@ -100,6 +131,11 @@ var show_submit = function() {
         );
     } else
         $('#dsd-channels-ctrls').show();
+
+    if ($("#dsd-chan-list ons-checkbox input:checked").length === state[state.current['uuid']]['channels'].length)
+        $('#dsd-chan-all').removeClass("button--outline");
+    else
+        $('#dsd-chan-all').addClass("button--outline");
 };
 
 var hop_change = function() {
@@ -148,6 +184,7 @@ var channels_details = function(opts) {
                     for (var chan of state[state.current['uuid']]['channels'])
                         $('#dsd-chan-' + jQclean(chan)).prop('checked', true);
                     show_submit();
+                    $('#dsd-chan-all').removeClass("button--outline");
                 }));
             $('#dsd-channels').append(
                 $('<button>', {
@@ -159,6 +196,7 @@ var channels_details = function(opts) {
                     for (var chan of state[state.current['uuid']]['channels'])
                         $('#dsd-chan-' + jQclean(chan)).prop('checked', false);
                     show_submit();
+                    $('#dsd-chan-all').addClass("button--outline");
                 }));
         }
 
@@ -184,10 +222,50 @@ var channels_details = function(opts) {
                     $('#dsd-chan-' + jQclean(chan)).prop('checked', false);
             }
         }
+        if ( state.current['uuid'] !== dev_details['uuid'] ||
+             dev_details['hop_shuffle'] !== state.current['hop_shuffle'] ) {
+            if ($("#dsd-shuffle-cb").length === 0 ) {
+                $('#dsd-shuffle-set').append(
+                    $('<ons-checkbox>', { id: "dsd-shuffle-cb",
+                                        checked: dev_details['hop_shuffle'] == 1 ? true : false
+                                        }))
+                    .on('change', show_submit)
+            } else $('#dsd-shuffle-cb').prop('checked', dev_details['hop_shuffle'] == 1 ? true : false);
+        }
+        if ( state.current['uuid'] !== dev_details['uuid'] ||
+             dev_details['hop_rate'] !== state.current['hop_rate'] ) {
+            if ($('#dsd-hr-value').length === 0) {
+                $('#dsd-hoprate-set').html(
+                    $('<ons-select>', { id: 'dsd-hr-value',
+                                        modifier: 'underbar' })
+                    .on("change", show_submit));
+                $('#dsd-hoprate-set').append(
+                    $('<ons-select>', { id: 'dsd-hr-period',
+                                        modifier: 'underbar' })
+                    .on("change", show_submit));
+                $('#dsd-hr-period').append($('<option>', { value: 'sec' }).text("/ second"));
+                $('#dsd-hr-period').append($('<option>', { value: 'min' }).text("/ minute"));
+                for (var c = 1; c <= 60; c++)
+                    $('#dsd-hr-value').append($('<option>', { id: 'dsd-hr-val-' + c }).text(c));
+            }
+            if ( dev_details['hop_rate'] <= 0 ) {
+                $('#dsd-hr-val-5').prop('selected', true);
+                $('#dsd-hr-period  option[value="sec"]').prop('selected', true);
+            } else {
+                var hr_s = hop_rate_selector(dev_details['hop_rate']);
+                $('#dsd-hr-period  option[value="'+hr_s[1]+'"]').prop('selected', true);
+                $('#dsd-hr-val-'+hr_s[0]).prop('selected', true);
+            }
+        }
 
-        $('#dsd-chan-hopping').show();
+        $('#dsd-chan-shuffle').show();
+        $("#dsd-chan-hoprate").show();
+        $("#dsd-chan-hopping").show();
+        $('fieldset').show();
     } else {
-        $('#dsd-chan-hopping').hide();
+        $('#dsd-chan-shuffle').hide();
+        $("#dsd-chan-hoprate").hide();
+        $("#dsd-chan-hopping").hide();
         if ( dev_details['uuid'] !== state.current['uuid'] ||
              $('option').length !== dev_details['channels'].length) {
             $('#dsd-channels').html(
@@ -223,6 +301,8 @@ exports.listDetails = function() {
                          ["kismet.datasource.capture_interface","capture_interface"],
                          ["kismet.datasource.type_driver/kismet.datasource.driver.type","type"],
                          ["kismet.datasource.hardware","hardware"],
+                         ["kismet.datasource.hop_shuffle","hop_shuffle"],
+                         ["kismet.datasource.hop_rate","hop_rate"],
                          ["kismet.datasource.num_packets","num_packets"]];
     $.ajax({
             url: kmd_rest_prefix + "datasource/by-uuid/" + dev_uuid + "/source.json",
@@ -236,11 +316,11 @@ exports.listDetails = function() {
 
         var status_text = "Paused";
         var status_bool = false;
-        if (data["paused"] == 0 && data["running"] == 1) {
+        if (! data["paused"] && data["running"]) {
             status_text = "Running";
             status_bool = true;
         } 
-        if (data["error"] == 1) {
+        if (data["error"]) {
             status_text = "Error";
         }
 
@@ -252,22 +332,23 @@ exports.listDetails = function() {
             $("#dsd-driver").text(kmd.sanitizeHTML(data["type"]));
             $("#dsd-hardware").text(kmd.sanitizeHTML(data["hardware"]));
         }
-        // textual refresh for packets and status
+        // textual refresh for hop rate, packets and status
+        if (uuid !== state.current['uuid'] || data["hop_rate"] !== state[uuid]["hop_rate"]) {
+            if (data["hop_rate"] <= 0)
+                $("#dsd-hoprate").text('Out of range!');
+            else 
+                $("#dsd-hoprate").text(hop_to_human(data["hop_rate"]));
+        }
         if (uuid !== state.current['uuid'] || data["num_packets"] !== state[uuid]["num_packets"])
             $("#dsd-packets").text(kmd.sanitizeHTML(data["num_packets"]));
-        if ($("#dsd-state").text() !== status_text)
+        if ($("#dsd-state").text() !== status_text) {
             $("#dsd-state").text(status_text);
-
-        // form state for active and hopping switches
-        if ( uuid !== state.current['uuid'] || status_bool !== state.current['status_bool'] ) {
-            if ( status_bool ) {
-                $('#dsd-active').prop('checked', true);
-                $('#dsd-hopping, button, fieldset, #dsd-chan-select').prop("disabled", false);
-            } else {
-                $('#dsd-active').prop('checked', false);
-                $('#dsd-hopping, button, fieldset, #dsd-chan-select').prop("disabled", true);
-            }
+            if (status_bool) $("#dsd-state").addClass("running");
+            else $("#dsd-state").removeClass("running");
+            if (data["error"]) $("#dsd-state").addClass("error");
+            else $("#dsd-state").removeClass("error");
         }
+
         if ( state.ignore_refresh !== true &&
              ( uuid !== state.current['uuid'] || data['hopping'] !== state.current['hopping'] ) )
             if ( data['hopping'] ) {
@@ -281,8 +362,26 @@ exports.listDetails = function() {
              status_bool !== state.current['status_bool'] ||
              data['hopping'] !== state[uuid]['hopping'] ||
              data['channel'] !== state[uuid]['channel'] ||
+             data['hop_rate'] !== state[uuid]['hop_rate'] ||
+             data['hop_shuffle'] !== state[uuid]['hop_shuffle'] ||
              data['hop_channels'].length !== state[uuid]['hop_channels'].length ) {
             channels_details({ data: data });
+        }
+
+        // form state for active and hopping switches
+        if ( uuid !== state.current['uuid'] || status_bool !== state.current['status_bool'] ) {
+            if ( status_bool ) {
+                $('#dsd-active').prop('checked', true);
+                $('#dsd-hopping, button, ons-checkbox, select').prop("disabled", false);
+            } else {
+                $('#dsd-active').prop('checked', false);
+                $('#dsd-hopping, button, ons-checkbox, select').prop("disabled", true);
+            }
+            // disable hopping for rtl-sdr sources
+            if (data['channels'].length < 2) {
+                $('#dsd-hopping, button, ons-checkbox, select').prop("disabled", true);
+                $('#dsd-chan-hopping').hide();
+            }
         }
 
         $("#datasource_details").data("uuid", dev_uuid)

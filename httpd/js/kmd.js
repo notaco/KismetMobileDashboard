@@ -76,8 +76,12 @@ exports.pauseResume = function() {
 };
 
 exports.pageChanged = function() {
-    if (! exports.paused)
+    var selector = '#' + exports.ui.navi.topPage.id + ' > #button-pause';
+    if (! exports.paused) {
+        $(selector).html($('<ons-icon>', { icon: "md-pause" }));
         kmd.startUpdates();
+    } else
+        $(selector).html($('<ons-icon>', { icon: "md-play" }));
 };
 
 

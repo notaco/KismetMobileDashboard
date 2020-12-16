@@ -52,6 +52,7 @@ exports.refreshSources = function() {
     .done(function(data) {
         var sources = data.filter(function(data) { return data['running'] == "1" }).length;
         var source_total = data.length;
+        var source_err = false
 
         var chans = {};
         for (var i = 0; i < source_total; i++) {
@@ -61,13 +62,17 @@ exports.refreshSources = function() {
                 chans[data[i]['channels'][c]] = 1;
             }
 
-            if (data[i]['error'] == 1) {
-                $('#numsources').addClass('error');
-                $('#SourceErrors').text("Source Error Detected");
-                $('#SourceErrors').addClass('error');
-            }
+            if (data[i]['error'] == 1) source_err = true;
         }
-
+        if (source_err) {
+            $('#numsources').addClass('error');
+            $('#source-title').text("Source Error Detected");
+            $('#source-title').addClass('error');
+        } else {
+            $('#numsources').removeClass('error');
+            $('#source-title').text("Active/Total Sources");
+            $('#source-title').removeClass('error');
+        }
         $('#numchans').text(Object.keys(chans).length);
         $('#numsources').text(sources);
         $('#numsources_total').text(source_total);

@@ -100,6 +100,10 @@
     color: #ff0000;
 }
 
+.running {
+    color: #00dd00;
+}
+
 fieldset.chan-list  { 
   margin: 0; 
   padding: 0; 
@@ -130,7 +134,7 @@ ul.chan-list li input {
 ul.chan-list li { 
   border: 1px transparent solid; 
   display:inline-block;
-  width:12em;
+  width:10em;
 } 
 
 ul.chan-list li label { 
@@ -140,5 +144,5 @@ ul.chan-list li:hover,
 ul.chan-list li.focus  { 
   background-color: lightblue; 
   border: 1px gray solid; 
-  width: 12em; 
+  width: 10em; 
 } 

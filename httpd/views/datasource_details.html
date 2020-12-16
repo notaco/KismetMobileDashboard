@@ -49,6 +49,12 @@
                 </ons-list-item>
                 <ons-list-item>
                     <div class="center">
+                        Hop rate:
+                    </div>
+                    <div class="right" id="dsd-hoprate"></div>
+                </ons-list-item>
+                <ons-list-item>
+                    <div class="center">
                         Packets:
                     </div>
                     <div class="right" id="dsd-packets"></div>
@@ -77,9 +83,17 @@
                     <div class="right" id="dsd-channels"></div>
                 </ons-list-item>
                 <ons-list-item id="dsd-chan-hopping">
-                    <fieldset class="chan-list">
+                    <fieldset class="chan-list" hidden>
                         <ul class="chan-list" id="dsd-chan-list"></ul>
                     </fieldset>
+                </ons-list-item>
+                <ons-list-item id="dsd-chan-shuffle">
+                    <div class="center">Shuffling:</div>
+                    <div class="right" id="dsd-shuffle-set"></div>
+                </ons-list-item>
+                <ons-list-item id="dsd-chan-hoprate">
+                    <div class="center">Hop rate:</div>
+                    <div class="right" id="dsd-hoprate-set"></div>
                 </ons-list-item>
             </ons-list>
         </ons-col>
