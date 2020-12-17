@@ -9,6 +9,7 @@ var page_id = 'datasource_details';
 kmd.timers[page_id] = {};
 var timers = kmd.timers[page_id];
 var state = { current: {} };
+var method = "POST";
 
 // regex to clean chan name for jquery
 var jQclean = function( chan_id ) {
@@ -306,10 +307,19 @@ exports.listDetails = function() {
                          ["kismet.datasource.num_packets","num_packets"]];
     $.ajax({
             url: kmd_rest_prefix + "datasource/by-uuid/" + dev_uuid + "/source.json",
-            type: "POST",
+            type: method,
             data: { "json": '{"fields":' + JSON.stringify(source_fields) + '}'}
     })
     .done(function(data, textStatus, jqXHR) {
+        // remap for full json from get used for microhttpd releases (kismet <= 2020-09)
+        if (method === 'GET')
+            for (var pair of source_fields) {
+                if (pair[0].match(/\//)) {
+                    var keys = pair[0].split("/");
+                    data[pair[1]] = data[keys[0]][keys[1]];
+                } else data[pair[1]] = data[pair[0]];
+            }
+
         if ( $("#datasource_details").data()['uuid'] !== dev_uuid )
             state.current['uuid'] = '';
         var uuid = data["uuid"];
@@ -389,6 +399,14 @@ exports.listDetails = function() {
         state.current['status_text'] = status_text;
         state.current['status_bool'] = status_bool;
         state[uuid] = data;
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        if (method === 'POST') {
+            method = 'GET';
+            clearTimeout(timers['updates'].timeout);
+            exports.listDetails();
+        } else
+            console.log(errorThrown);
     })
     .always(function() {
         timers['updates'].timeout = setTimeout(exports.listDetails, 5000);

@@ -18,7 +18,7 @@ exports.refreshStatus = function() {
                                        '["kismet.system.timestamp.start_sec","start_sec"],' +
                                        '["kismet.system.devices.count","devices"],' +
                                        '["kismet.device.packets_rrd/kismet.common.rrd.last_time","last_time"],' +
-                                       '["kismet.device.packets_rrd/kismet.common.rrd.minute_vec","vector"]}' }
+                                       '["kismet.device.packets_rrd/kismet.common.rrd.minute_vec","vector"]]}' }
     })
     .done(function(data, textStatus, jqXHR) {
         var utime = Math.round((data['ts_sec'] - data['start_sec']) / 60);
