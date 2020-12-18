@@ -38,6 +38,15 @@ $(function() {
 
 <body>
 
+<ons-modal direction="up" id="modal-loading">
+  <div class="centered">
+    <p>
+      <ons-icon icon="md-spinner" size="28px" spin></ons-icon> 
+      <span id="spinner-msg">Loading...</span>
+    </p>
+  </div>
+</ons-modal>
+
 <ons-splitter>
     <ons-splitter-side id="menu" side="right" width="220px" collapse swipeable>
         <ons-page>
@@ -49,7 +58,7 @@ $(function() {
                 <ons-list-item onclick="kmd.ui.push_page('views/datasources_list.html')" tappable>
                     <ons-icon icon="fa-puzzle-piece" class="icon-nav-menu"></ons-icon>Datasources
                 </ons-list-item>
-                <ons-list-item onclick="kmd.ui.push_page('interfaces.html')" tappable>
+                <ons-list-item onclick="kmd.ui.push_page('views/interfaces.html')" tappable>
                     <ons-icon icon="fa-code-branch" class="icon-nav-menu"></ons-icon>Interfaces
                 </ons-list-item>
                 <ons-list-item onclick="kmd_login.showLogin();" tappable>
@@ -71,6 +80,11 @@ $(function() {
 <template id="token-page">
     <ons-dialog id="token-dialog">
         <div id="token-content" class="login-text"></div>
+    </ons-dialog>
+</template>
+<template id="dialog-page">
+    <ons-dialog id="general-dialog" cancelable>
+        <div id="dialog-content"></div>
     </ons-dialog>
 </template>
 

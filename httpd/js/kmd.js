@@ -18,10 +18,35 @@ exports.ui = {
             data_obj = {};
         exports.ui.menu.close();
         if (! page.includes(exports.ui.navi.topPage.id))
-            exports.ui.navi.pushPage(page, { animation: 'none', data: data_obj });
+            exports.ui.navi.bringPageTop(page, { animation: 'none', data: data_obj });
     },
     alert: function(message) {
         ons.notification.toast(message, { timeout: 1000, animation: 'fall' })
+    },
+    show_spinner: function(message) {
+        if (typeof message === 'string')
+            $('#spinner-msg').text(message);
+        $('#modal-loading').show();
+    },
+    hide_spinner: function() {
+        $('#spinner-msg').text('Loading...');
+        $('#modal-loading').hide();
+    },
+    show_dialog: function(message) {
+        var dialog = document.getElementById('general-dialog');
+        if (dialog) {
+            $('#general-content').text(message);
+            dialog.show();
+        } else {
+            ons.createElement('dialog-page', { append: true })
+            .then(function(dialog) {
+                $('#dialog-content').html(message);
+                dialog.show();
+            });
+        }
+    },
+    hide_dialog: function() {
+        $('#general-dialog').hide();
     }
 };
 

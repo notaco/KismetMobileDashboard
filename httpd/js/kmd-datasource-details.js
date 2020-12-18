@@ -91,7 +91,7 @@ var form_set_channels = function() {
     $.ajax({
         url: kmd_rest_prefix + "datasource/by-uuid/" + state.current['uuid'] + "/set_channel.cmd",
         type: "POST",
-        data: encodeURIComponent("json=" + JSON.stringify(cmd_dict))
+        data: "json=" + encodeURIComponent(JSON.stringify(cmd_dict))
     })
     .done(function(data, textStatus, jqXHR) {
         kmd.ui.alert("Set channel request successful!");
@@ -308,7 +308,7 @@ exports.listDetails = function() {
     $.ajax({
             url: kmd_rest_prefix + "datasource/by-uuid/" + dev_uuid + "/source.json",
             type: method,
-            data: { "json": '{"fields":' + JSON.stringify(source_fields) + '}'}
+            data: method === 'POST' ? { "json": '{"fields":' + JSON.stringify(source_fields) + '}'} : {}
     })
     .done(function(data, textStatus, jqXHR) {
         // remap for full json from get used for microhttpd releases (kismet <= 2020-09)
@@ -329,7 +329,8 @@ exports.listDetails = function() {
         if (! data["paused"] && data["running"]) {
             status_text = "Running";
             status_bool = true;
-        } 
+        } else if (! data["paused"])
+            status_text = "Disabled";
         if (data["error"]) {
             status_text = "Error";
         }
@@ -382,16 +383,19 @@ exports.listDetails = function() {
         if ( uuid !== state.current['uuid'] || status_bool !== state.current['status_bool'] ) {
             if ( status_bool ) {
                 $('#dsd-active').prop('checked', true);
-                $('#dsd-hopping, button, ons-checkbox, select').prop("disabled", false);
+                $('#dsd-active').prop("disabled", false);
+                $('#dsd-hopping, button, ons-checkbox, ons-select').prop("disabled", false);
             } else {
                 $('#dsd-active').prop('checked', false);
-                $('#dsd-hopping, button, ons-checkbox, select').prop("disabled", true);
+                $('#dsd-hopping, button, ons-checkbox, ons-select').prop("disabled", true);
             }
             // disable hopping for rtl-sdr sources
             if (data['channels'].length < 2) {
-                $('#dsd-hopping, button, ons-checkbox, select').prop("disabled", true);
+                $('#dsd-hopping, button, ons-checkbox, ons-select').prop("disabled", true);
                 $('#dsd-chan-hopping').hide();
             }
+            if (status_text === "Disabled")
+                $('#dsd-active').prop("disabled", true);
         }
 
         $("#datasource_details").data("uuid", dev_uuid)
