@@ -345,8 +345,8 @@ exports.listDetails = function() {
         }
         // textual refresh for hop rate, packets and status
         if (uuid !== state.current['uuid'] || data["hop_rate"] !== state[uuid]["hop_rate"]) {
-            if (data["hop_rate"] <= 0)
-                $("#dsd-hoprate").text('Out of range!');
+            if (data["hop_rate"] < 0)
+                $("#dsd-hoprate").text('Negative number');
             else 
                 $("#dsd-hoprate").text(hop_to_human(data["hop_rate"]));
         }

@@ -71,7 +71,7 @@ exports.removeStorage = function(key) {
 // structure for controlling ajax updates based on current view
 exports.timers = { home: {} };
 exports['timers'].running = '';
-exports.paused = true;
+exports.paused = false;
 
 exports.startUpdates = function() {
     exports.paused = false;
@@ -89,24 +89,24 @@ exports.stopUpdates = function() {
 };
 
 exports.pauseResume = function() {
-    var selector = '#' + exports.ui.navi.topPage.id + ' > #button-pause';
+    var p_button = $('#' + exports.ui.navi.topPage.id + ' > #button-pause');
     if (exports.paused === false) {
-        $(selector).html($('<ons-icon>', { icon: "md-play" }));
+        p_button.html($('<ons-icon>', { icon: "md-play" }));
         exports.stopUpdates();
     } else if (exports.paused === true) {
-        $(selector).html($('<ons-icon>', { icon: "md-pause" }));
+        p_button.html($('<ons-icon>', { icon: "md-pause" }));
         exports.startUpdates();
     } else
         exports.ui.alert('Error: unexpected state: ' + exports.paused);
 };
 
 exports.pageChanged = function() {
-    var selector = '#' + exports.ui.navi.topPage.id + ' > #button-pause';
-    if (! exports.paused) {
-        $(selector).html($('<ons-icon>', { icon: "md-pause" }));
+    var p_button = $('#' + exports.ui.navi.topPage.id + ' > #button-pause');
+    if (exports.paused === false) {
+        p_button.html($('<ons-icon>', { icon: "md-pause" }));
         kmd.startUpdates();
     } else
-        $(selector).html($('<ons-icon>', { icon: "md-play" }));
+        p_button.html($('<ons-icon>', { icon: "md-play" }));
 };
 
 
