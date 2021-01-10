@@ -47,6 +47,9 @@ exports.ui = {
     },
     hide_dialog: function() {
         $('#general-dialog').hide();
+    },
+    devices_list: function(type) {
+        exports.ui.push_page('views/devices_list.html', { type: type })
     }
 };
 
@@ -70,21 +73,18 @@ exports.removeStorage = function(key) {
 
 // structure for controlling ajax updates based on current view
 exports.timers = { home: {} };
-exports['timers'].running = '';
 exports.paused = false;
 
 exports.startUpdates = function() {
     exports.paused = false;
     var page_id = exports.ui.navi.topPage.id;
-    if (page_id !== '' && page_id !== exports['timers'].running) {
-        exports['timers'].running = page_id;
+    if (page_id !== '') {
         for (var ajax in exports.timers[page_id])
             exports.timers[page_id][ajax].fn();
     }
 };
 
 exports.stopUpdates = function() {
-    exports['timers'].running = '';
     exports.paused = true;
 };
 

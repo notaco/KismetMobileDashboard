@@ -92,12 +92,12 @@ exports.refreshDevices = function() {
             data: { "json": '{"fields":[["kismet.device.base.type","base_type"]]}' }
     })
     .done(function(data, textStatus, jqXHR) {
-        $('#num802Aps').text(data.filter(function(data) { return data['base_type'] == "Wi-Fi AP" }).length);
-        $('#num802Clients').text(data.filter(function(data) { return data['base_type'] == "Wi-Fi Client" }).length);
-        $('#num802Devices').text(data.filter(function(data) { return data['base_type'] == "Wi-Fi Device" }).length);
-        $('#num802Bridges').text(data.filter(function(data) { return data['base_type'] == "Wi-Fi Bridged" }).length);
-        $('#num802Adhoc').text(data.filter(function(data) { return data['base_type'] == "Wi-Fi Ad-Hoc" }).length);
-        $('#num802WDS').text(data.filter(function(data) { return data['base_type'] == "Wi-Fi WDS" }).length);
+        $('#num802Aps').text(data.filter(function(data) { return data['base_type'] === "Wi-Fi AP" }).length);
+        $('#num802Clients').text(data.filter(function(data) { return data['base_type'] === "Wi-Fi Client" }).length);
+        $('#num802Devices').text(data.filter(function(data) { return data['base_type'] === "Wi-Fi Device" }).length);
+        $('#num802Bridges').text(data.filter(function(data) { return data['base_type'] === "Wi-Fi Bridged" }).length);
+        $('#num802Adhoc').text(data.filter(function(data) { return data['base_type'] === "Wi-Fi Ad-Hoc" }).length);
+        $('#num802WDS').text(data.filter(function(data) { return data['base_type'].match("Wi-Fi WDS") }).length);
     })
     .always(function() {
         timers['devices'].timeout = setTimeout(exports.refreshDevices, 5000);

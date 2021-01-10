@@ -1,8 +1,8 @@
-<ons-page id="interfaces">
+<ons-page id="devices_list">
     <script>
     $(function() {
-        if (typeof kmd_interfaces !== 'object') {
-            $.getScript('js/kmd-interfaces.js');
+        if (typeof kmd_devices_list !== 'object') {
+            $.getScript('js/kmd-devices-list.js');
         }
     });
     </script>
@@ -11,7 +11,7 @@
             <ons-back-button>Back</ons-back-button>
         </div>
         <div class="center">
-            <ons-icon icon="fa-cog" class="icon-header-bar"></ons-icon>Interfaces
+            <ons-icon icon="fa-cog" class="icon-header-bar"></ons-icon><span id="dl-title"></span>
         </div>
         <div class="right">
             <ons-toolbar-button onclick="kmd.ui.menu.open()">
@@ -19,18 +19,7 @@
             </ons-toolbar-button>
         </div>
     </ons-toolbar>
-        <div class="iface-header"><span class="ofa">Unconfigured devices:</span>
-            <span class="blue righted show-clickable " onclick="kmd_interfaces.probeDevices();">
-                Probe devices
-            </span>
-        </div>
-        <div id="interfaceslist">
-        <ons-card>
-            <div class="dev-note">Devices not probed.</div>
-        </ons-card>
-        </div>
-        <div class="iface-header">Configured:</div>
-        <div id="configuredlist"></div>
+    <ons-list id="devices-list"></ons-list>
     <ons-bottom-toolbar>
         <h2 class="card__title bottom-toolbar">KISMET Mobile Dashboard</h2>
     </ons-bottom-toolbar>

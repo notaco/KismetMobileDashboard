@@ -110,12 +110,22 @@ $(function() {
                     <ons-col></ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col class="bignum"><span id="numsources">-</span>/<span id="numsources_total">-</span><br><span class="subtitle" id="source-title">Active/Total Sources</span><br></ons-col>
-                    <ons-col class="bignum"><span id="numchans">-</span><br><span class="subtitle">Channels</span></ons-col>
+                    <ons-col class="bignum">
+                        <span id="numsources">-</span>/
+                        <span id="numsources_total">-</span><br>
+                        <span class="subtitle" id="source-title">Active/Total Sources</span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="numchans">-</span><br>
+                        <span class="subtitle">Channels</span>
+                    </ons-col>
                     <ons-col class="bignum"><span id="numpackets">-</span>
                         <br><span class="subtitle">Packets/sec</span>
                     </ons-col>
-                    <ons-col class="bignum"><span id="numdevs">-</span><i class="dataup" id="devup"></i><i class="datadown" id="devdown"></i><br><span class="subtitle">Total # of Devices</span></ons-col>
+                    <ons-col class="bignum">
+                        <span id="numdevs">-</span><br>
+                        <span class="subtitle">Total # of Devices</span>
+                    </ons-col>
                 </ons-row>
             </div>
             <div class="card">
@@ -125,12 +135,30 @@ $(function() {
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col class="bignum"><span id="num802Aps" onclick="getDev_byType('Wi-Fi AP')" class="show-clickable">-</span><br><span class="subtitle">APs</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Clients" onclick="getDev_byType('Wi-Fi Client')" class="show-clickable">-</span><br><span class="subtitle">Clients</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Devices" onclick="getDev_byType('Wi-Fi Device')" class="show-clickable">-</span><br><span class="subtitle">Devices</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Bridges" onclick="getDev_byType('Wi-Fi Bridged')" class="show-clickable">-</span><br><span class="subtitle">Bridged</span></ons-col>
-                    <ons-col class="bignum"><span id="num802Adhoc" onclick="getDev_byType('Wi-Fi Ad-Hoc')" class="show-clickable">-</span><br><span class="subtitle">AdHoc </span></ons-col>
-                    <ons-col class="bignum"><span id="num802WDS" onclick="getDev_byType('WiFi WDS')" class="show-clickable">-</span><br><span class="subtitle">WDS </span></ons-col>
+                    <ons-col class="bignum">
+                        <span id="num802Aps" class="show-clickable" onclick="kmd.ui.devices_list('Wi-Fi AP')">-</span><br>
+                        <span class="subtitle show-clickable" onclick="kmd.ui.devices_list('Wi-Fi AP')">APs</span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="num802Clients" onclick="kmd.ui.devices_list('Wi-Fi Client')" class="show-clickable">-</span><br>
+                        <span onclick="kmd.ui.devices_list('Wi-Fi Client')" class="subtitle show-clickable">Clients</span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="num802Devices" class="show-clickable" onclick="kmd.ui.devices_list('Wi-Fi Device')">-</span><br>
+                        <span class="subtitle show-clickable" onclick="kmd.ui.devices_list('Wi-Fi Device')">Devices</span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="num802Bridges" class="show-clickable" onclick="kmd.ui.devices_list('Wi-Fi Bridged')">-</span><br>
+                        <span class="subtitle show-clickable" onclick="kmd.ui.devices_list('Wi-Fi Bridged')">Bridged</span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="num802Adhoc" class="show-clickable" onclick="kmd.ui.devices_list('Wi-Fi Ad-Hoc')">-</span><br>
+                        <span class="subtitle show-clickable" onclick="kmd.ui.devices_list('Wi-Fi Ad-Hoc')">AdHoc </span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="num802WDS" class="show-clickable" onclick="kmd.ui.devices_list('Wi-Fi WDS')">-</span><br>
+                        <span class="subtitle show-clickable" onclick="kmd.ui.devices_list('Wi-Fi WDS')">WDS </span>
+                    </ons-col>
                 </ons-row>
             </div>
             <div class="card">
@@ -157,8 +185,14 @@ $(function() {
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col class="bignum"><span id="numBTLE" onclick="getDev_byType('BTLE')" class="show-clickable">-</span><br><span class="subtitle">BTLE Devices</span></ons-col>
-                    <ons-col class="bignum"><span id="numBR" onclick="getDev_byType('BREDR')" class="show-clickable">-</span><br><span class="subtitle">BR/EDR Devices</span></ons-col>
+                    <ons-col class="bignum">
+                        <span id="numBTLE" onclick="kmd.ui.devices_list('BTLE')" class="show-clickable">-</span><br>
+                        <span onclick="kmd.ui.devices_list('BTLE')" class="subtitle show-clickable">BTLE Devices</span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="numBR" onclick="kmd.ui.devices_list('BREDR')" class="show-clickable">-</span><br>
+                        <span onclick="kmd.ui.devices_list('BREDR')" class="subtitle show-clickable">BR/EDR Devices</span>
+                    </ons-col>
                 </ons-row>
             </div>
             <div class="card">
@@ -168,12 +202,30 @@ $(function() {
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <ons-col class="bignum"><span id="numRTL433">-</span><br><span class="subtitle" onclick="getDev_byType('Sensor')" class="show-clickable">RTL433</span></ons-col>
-                    <ons-col class="bignum"><span id="numRTLADSB">-</span><br><span class="subtitle" onclick="getDev_byType('Airplane')" class="show-clickable">ADSB</span></ons-col>
-                    <ons-col class="bignum"><span id="numRTLAMR">-</span><br><span class="subtitle" onclick="getDev_byType('AMR')" class="show-clickable">AMR</span></ons-col>
-                    <ons-col class="bignum"><span id="numZWave">-</span><br><span class="subtitle" onclick="getDev_byType('ZWave')" class="show-clickable">Z-Wave</span></ons-col>
-                    <ons-col class="bignum"><span id="numMousejack">-</span><br><span class="subtitle" onclick="getDev_byType('KB/Mouse')" class="show-clickable">Mousejack</span></ons-col>
-                    <ons-col class="bignum"><span id="numUAV">-</span><br><span class="subtitle" onclick="getDev_byType('UAV')" class="show-clickable">UAV</span></ons-col>
+                    <ons-col class="bignum">
+                        <span id="numRTL433" class="show-clickable" onclick="kmd.ui.devices_list('RTL433')">-</span><br>
+                        <span class="subtitle show-clickable" onclick="kmd.ui.devices_list('RTL433')">RTL433</span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="numRTLADSB" class="show-clickable" onclick="kmd.ui.devices_list('RTLADSB')">-</span><br>
+                        <span class="subtitle show-clickable" onclick="kmd.ui.devices_list('RTLADSB')">ADSB</span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="numRTLAMR" class="show-clickable" onclick="kmd.ui.devices_list('RTLAMR')">-</span><br>
+                        <span class="subtitle show-clickable" onclick="kmd.ui.devices_list('RTLAMR')">AMR</span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="numZWave" class="show-clickable" onclick="kmd.ui.devices_list('Z-Wave')">-</span><br>
+                        <span class="subtitle show-clickable" onclick="kmd.ui.devices_list('Z-Wave')">Z-Wave</span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="numMousejack" class="show-clickable" onclick="kmd.ui.devices_list('NrfMousejack')">-</span><br>
+                        <span class="subtitle show-clickable" onclick="kmd.ui.devices_list('NrfMousejack')">Mousejack</span>
+                    </ons-col>
+                    <ons-col class="bignum">
+                        <span id="numUAV" class="show-clickable" onclick="kmd.ui.devices_list('UAV')">-</span><br>
+                        <span class="subtitle show-clickable" onclick="kmd.ui.devices_list('UAV')">UAV</span>
+                    </ons-col>
                 </ons-row>
             </div>
         </div>

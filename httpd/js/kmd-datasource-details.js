@@ -296,6 +296,7 @@ exports.listDetails = function() {
                          ["kismet.datasource.paused","paused"],
                          ["kismet.datasource.running","running"],
                          ["kismet.datasource.error","error"],
+                         ["kismet.datasource.error_reason","error_reason"],
                          ["kismet.datasource.channel","channel"],
                          ["kismet.datasource.hop_channels","hop_channels"],
                          ["kismet.datasource.name","name"],
@@ -356,8 +357,16 @@ exports.listDetails = function() {
             $("#dsd-state").text(status_text);
             if (status_bool) $("#dsd-state").addClass("running");
             else $("#dsd-state").removeClass("running");
-            if (data["error"]) $("#dsd-state").addClass("error");
-            else $("#dsd-state").removeClass("error");
+            if (data["error"]) {
+                $("#dsd-state").addClass("error show-clickable");
+                $("#dsd-state").on('click', function() {
+                    kmd.ui.show_dialog("<p class='iface-header'>Error message:</p>" + data['error_reason']);
+                });
+            }
+            else {
+                $("#dsd-state").removeClass("error show-clickable");
+                $("#dsd-state").off('click');
+            }
         }
 
         if ( state.ignore_refresh !== true &&
